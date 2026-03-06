@@ -5,428 +5,315 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#1e1b18">
-<title>Panel Ejecutivo</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#1a1714">
+<title>Villahermosa 2030 - Estructura Ejecutiva</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 <header class="hdr">
-  <div class="hdr-inner">
+  <div class="hdr-in">
     <div class="logo">
-      <div class="logo-gem"><div class="logo-gem-inner"></div></div>
-      <div class="logo-text">
+      <div class="gem"><div class="gem-c"></div></div>
+      <div class="logo-t">
         <h1>Villahermosa 2030</h1>
-        <p>Estructura Ejecutiva · Tres Pilares Estratégicos</p>
+        <p>Estructura Ejecutiva · Cuatro Pilares Estratégicos</p>
       </div>
     </div>
     <div class="hdr-stats" id="hdrStats"></div>
   </div>
 </header>
 
-<!-- TABS -->
 <nav class="tabs">
-  <div class="tabs-inner">
-    <button class="tab act-all" onclick="setPilar('all',this)">
-      Todos <span class="tab-badge" id="tb-all" style="background:rgba(221,201,163,.15);color:var(--c-accent)"></span>
-    </button>
-    <button class="tab" onclick="setPilar('Juridico',this)">
-      ⚖ Jurídico <span class="tab-badge" id="tb-j" style="background:rgba(153,21,71,.2);color:var(--c-j)"></span>
-    </button>
-    <button class="tab" onclick="setPilar('Tecnico',this)">
-      🏗 Técnico <span class="tab-badge" id="tb-t" style="background:rgba(196,153,85,.2);color:var(--c-t)"></span>
-    </button>
-    <button class="tab" onclick="setPilar('Financiero',this)">
-      💼 Financiero <span class="tab-badge" id="tb-f" style="background:rgba(119,17,57,.2);color:#c06070"></span>
-    </button>
+  <div class="tabs-in">
+    <button class="tab aall" onclick="setP('all',this)">Todos <span class="tb" id="tb-all" style="background:rgba(221,201,163,.14);color:var(--acc)"></span></button>
+    <button class="tab" onclick="setP('J',this)">⚖ Jurídico <span class="tb" id="tb-j" style="background:rgba(153,21,71,.18);color:var(--j)"></span></button>
+    <button class="tab" onclick="setP('T',this)">🏗 Técnico <span class="tb" id="tb-t" style="background:rgba(196,153,85,.18);color:var(--t)"></span></button>
+    <button class="tab" onclick="setP('C',this)">💼 Comercial <span class="tb" id="tb-c" style="background:rgba(153,50,80,.18);color:#b06080"></span></button>
+    <button class="tab" onclick="setP('F',this)">📊 Financiero <span class="tb" id="tb-f" style="background:rgba(107,79,160,.18);color:#9b8bc0"></span></button>
   </div>
 </nav>
 
-<!-- TOOLBAR -->
-<div class="toolbar">
-  <div class="toolbar-inner">
-    <input class="search" type="text" placeholder="Buscar actividad, responsable…" oninput="setSearch(this.value)" id="searchBox">
-    <select class="sel" onchange="setEstado(this.value)">
+<div class="tbar">
+  <div class="tbar-in">
+    <input class="srch" type="text" placeholder="Buscar actividad, responsable…" oninput="setSrch(this.value)">
+    <select class="fsel" onchange="setEst(this.value)">
       <option value="">Estado: Todos</option>
       <option>Pendiente</option><option>En Proceso</option>
       <option>Revisión</option><option>Completado</option><option>Bloqueado</option>
     </select>
-    <select class="sel" onchange="setPrio(this.value)">
+    <select class="fsel" onchange="setPri(this.value)">
       <option value="">Prioridad: Todas</option>
       <option>Alta</option><option>Media</option><option>Baja</option>
     </select>
-    <div class="view-group">
-      <button class="vbtn active" id="btnLista" onclick="setView('lista')">≡ Lista</button>
-      <button class="vbtn" id="btnGantt" onclick="setView('gantt')">▦ Gantt</button>
+    <div class="vg">
+      <button class="vb act" id="btnL" onclick="setV('l')">≡ Lista</button>
+      <button class="vb" id="btnG" onclick="setV('g')">▦ Gantt</button>
     </div>
   </div>
 </div>
 
-<!-- PROGRESS -->
-<div class="progress-bar-wrap" id="progWrap">
-  <div class="prog-label">Progreso General</div>
-  <div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
-  <div class="prog-pct" id="progPct">0%</div>
-  <div class="prog-chips" id="progChips"></div>
+<div class="progw" id="progW">
+  <div class="pl">Progreso General</div>
+  <div class="pt"><div class="pf" id="pf" style="width:0%"></div></div>
+  <div class="pp" id="pp">0%</div>
+  <div class="pchips" id="pch"></div>
 </div>
 
-<!-- MAIN -->
-<main class="main" id="mainView"></main>
+<main class="main" id="mainV"></main>
 
 <!-- MODAL -->
-<div class="modal-ov hidden" id="modalOv">
-  <div class="modal-box">
-    <div class="modal-hdr">
-      <div class="modal-title" id="mTitle">Editar Actividad</div>
-      <button class="modal-close" onclick="closeModal()">✕</button>
+<div class="mov hidden" id="mov">
+  <div class="mbox">
+    <div class="mhdr">
+      <div class="mtitle" id="mtitle">Editar Actividad</div>
+      <button class="mclose" onclick="closeM()">✕</button>
     </div>
-    <div class="mf">
-      <label>Actividad</label>
-      <input class="m-inp" id="m-act" type="text">
-    </div>
-    <div class="mf">
-      <label>Subactividad</label>
-      <textarea class="m-ta" id="m-sub" rows="2"></textarea>
-    </div>
-    <div class="mf-2">
-      <div class="mf">
-        <label>Responsable</label>
-        <select class="m-sel" id="m-resp">
-          <option>SAF</option><option>SAF / Patrimonio</option>
-          <option>Consejería Jurídica</option><option>SOTOP</option>
-          <option>INVITAB</option><option>TURISMO</option>
-          <option>SAF / SOTOP</option><option>Inversionista</option>
-          <option>Valuador Certificado</option>
-          <option>Comité Interinstitucional</option>
-          <option>Comité de Licitación</option>
+    <div class="mf"><label>Actividad</label><input class="mi" id="m-act" type="text"></div>
+    <div class="mf"><label>Subactividad</label><textarea class="mta" id="m-sub" rows="2"></textarea></div>
+    <div class="m2">
+      <div class="mf"><label>Responsable</label>
+        <select class="ms" id="m-resp">
+          <option>SAF</option><option>SAF / Patrimonio</option><option>Consejería Jurídica</option>
+          <option>SOTOP</option><option>INVITAB</option><option>TURISMO</option>
+          <option>SAF / SOTOP</option><option>Inversionista</option><option>Valuador Certificado</option>
+          <option>Comité Interinstitucional</option><option>Comité de Licitación</option>
           <option>Notario Público</option><option>Consultor</option>
           <option>Congreso del Estado</option><option>Ayuntamientos</option>
         </select>
       </div>
-      <div class="mf">
-        <label>Estado</label>
-        <select class="m-sel" id="m-est">
-          <option>Pendiente</option><option>En Proceso</option>
-          <option>Revisión</option><option>Completado</option><option>Bloqueado</option>
+      <div class="mf"><label>Estado</label>
+        <select class="ms" id="m-est">
+          <option>Pendiente</option><option>En Proceso</option><option>Revisión</option>
+          <option>Completado</option><option>Bloqueado</option>
         </select>
       </div>
     </div>
-    <div class="mf-2">
-      <div class="mf">
-        <label>Fecha Inicio</label>
-        <input class="m-inp" id="m-ini" type="date">
-      </div>
-      <div class="mf">
-        <label>Fecha Fin</label>
-        <input class="m-inp" id="m-fin" type="date">
-      </div>
+    <div class="m2">
+      <div class="mf"><label>Fecha Inicio</label><input class="mi" id="m-ini" type="date"></div>
+      <div class="mf"><label>Fecha Fin</label><input class="mi" id="m-fin" type="date"></div>
     </div>
-    <div class="mf">
-      <label>Prioridad</label>
-      <select class="m-sel" id="m-prio">
+    <div class="mf"><label>Prioridad</label>
+      <select class="ms" id="m-pri">
         <option>Alta</option><option>Media</option><option>Baja</option>
       </select>
     </div>
-    <div class="modal-footer">
-      <button class="btn-delete" id="mBtnDel" onclick="deleteItem()">🗑 Eliminar</button>
-      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
-      <button class="btn-save" onclick="saveModal()">Guardar</button>
+    <div class="mfoot">
+      <button class="mbdel hidden" id="mbdel" onclick="delItem()">🗑 Eliminar</button>
+      <button class="mbcanc" onclick="closeM()">Cancelar</button>
+      <button class="mbsave" onclick="saveM()">Guardar</button>
     </div>
   </div>
 </div>
 
 <script>
-/* ═══════════════════════════════════════════════════
-   DATA
-═══════════════════════════════════════════════════ */
-let DATA = [{"ID":1,"PILAR":"Base Jurídica","RUBRO_ID":"J1","RUBRO_NUM":1.1,"RUBRO_NOMBRE":"Justificación del Desarrollo Económico y Turistico","ACT_ID":"J1-A1","ACTIVIDAD":"Justificación del Desarrollo Económico y Turistico","SUBACTIVIDAD":"Solicitud del Plan Maestro a SOTOP","RESPONSABLE":"TURISMO","FECHA_INICIO":"2026-03-09","FECHA_FIN":"2026-03-09","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":2,"PILAR":"Base Jurídica","RUBRO_ID":"J1","RUBRO_NUM":1.1,"RUBRO_NOMBRE":"Justificación del Desarrollo Económico y Turistico","ACT_ID":"J1-A2","ACTIVIDAD":"Justificación del Desarrollo Económico y Turistico","SUBACTIVIDAD":"Respuesta de SOTOP","RESPONSABLE":"SOTOP","FECHA_INICIO":"2026-03-10","FECHA_FIN":"2026-03-10","ESTADO":"En Proceso","PRIORIDAD":"Alta"},{"ID":3,"PILAR":"Base Jurídica","RUBRO_ID":"J2","RUBRO_NUM":1.2,"RUBRO_NOMBRE":"Solicitud de Enajenación","ACT_ID":"J2-A1","ACTIVIDAD":"Oficio de solicitud para la enajenación de terrenos","SUBACTIVIDAD":"Oficio de solicitud para la enajenación de terrenos a SAF","RESPONSABLE":"TURISMO","FECHA_INICIO":"2026-03-11","FECHA_FIN":"2026-03-11","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":4,"PILAR":"Base Jurídica","RUBRO_ID":"J3","RUBRO_NUM":1.3,"RUBRO_NOMBRE":"Donación de Terrenos","ACT_ID":"J3-A1","ACTIVIDAD":"Proceso de donación de Terrenos","SUBACTIVIDAD":"Solicitud de donación","RESPONSABLE":"SAF / Patrimonio","FECHA_INICIO":"","FECHA_FIN":"","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":5,"PILAR":"Base Jurídica","RUBRO_ID":"J3","RUBRO_NUM":1.3,"RUBRO_NOMBRE":"Donación de Terrenos","ACT_ID":"J3-A2","ACTIVIDAD":"Proceso de donación de Terrenos","SUBACTIVIDAD":"Se realiza el dictamen técnico","RESPONSABLE":"INVITAB","FECHA_INICIO":"","FECHA_FIN":"","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":6,"PILAR":"Base Jurídica","RUBRO_ID":"J3","RUBRO_NUM":1.3,"RUBRO_NOMBRE":"Donación de Terrenos","ACT_ID":"J3-A3","ACTIVIDAD":"Proceso de donación de Terrenos","SUBACTIVIDAD":"Se somete a Consejo de Administración para su aprobación","RESPONSABLE":"INVITAB","FECHA_INICIO":"","FECHA_FIN":"","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":7,"PILAR":"Base Jurídica","RUBRO_ID":"J3","RUBRO_NUM":1.3,"RUBRO_NOMBRE":"Donación de Terrenos","ACT_ID":"J3-A4","ACTIVIDAD":"Proceso de donación de Terrenos","SUBACTIVIDAD":"Se notifica al solicitante la autorización para que proceda a presentar al notario que realizará el instrumento de donación","RESPONSABLE":"INVITAB","FECHA_INICIO":"","FECHA_FIN":"","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":8,"PILAR":"Base Jurídica","RUBRO_ID":"J3","RUBRO_NUM":1.3,"RUBRO_NOMBRE":"Donación de Terrenos","ACT_ID":"J3-A5","ACTIVIDAD":"Proceso de donación de Terrenos","SUBACTIVIDAD":"Escrituración del terreno","RESPONSABLE":"Notario Público","FECHA_INICIO":"","FECHA_FIN":"","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":9,"PILAR":"Base Jurídica","RUBRO_ID":"J4","RUBRO_NUM":1.4,"RUBRO_NOMBRE":"Proceso de Desafectación","ACT_ID":"J4-A1","ACTIVIDAD":"Elaboración de dictamen jurídico de desafectación","SUBACTIVIDAD":"Solicitud de opinión técnica y levantamiento topográfico a SOTOP","RESPONSABLE":"SAF / Patrimonio","FECHA_INICIO":"2026-03-12","FECHA_FIN":"2026-03-12","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":10,"PILAR":"Base Jurídica","RUBRO_ID":"J4","RUBRO_NUM":1.4,"RUBRO_NOMBRE":"Proceso de Desafectación","ACT_ID":"J4-A2","ACTIVIDAD":"Concentración de documentación registral","SUBACTIVIDAD":"Certificado de existencia o inexistencia de gravamen, historia registral y copias certificadas de las escrituras públicas","RESPONSABLE":"SAF / Patrimonio","FECHA_INICIO":"2026-03-12","FECHA_FIN":"2026-03-12","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":11,"PILAR":"Base Jurídica","RUBRO_ID":"J4","RUBRO_NUM":1.4,"RUBRO_NOMBRE":"Proceso de Desafectación","ACT_ID":"J4-A3","ACTIVIDAD":"Elaboración de dictamen jurídico de desafectación","SUBACTIVIDAD":"Respuesta de opinión técnica y levantamiento topográfico a Patrimonio","RESPONSABLE":"SOTOP","FECHA_INICIO":"2026-03-31","FECHA_FIN":"2026-03-31","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":12,"PILAR":"Base Jurídica","RUBRO_ID":"J4","RUBRO_NUM":1.4,"RUBRO_NOMBRE":"Proceso de Desafectación","ACT_ID":"J4-A4","ACTIVIDAD":"Publicación en el Periódico Oficial","SUBACTIVIDAD":"Acuerdo administrativo para la desafectación del regimen del dominio público","RESPONSABLE":"SAF / Patrimonio","FECHA_INICIO":"2026-03-31","FECHA_FIN":"2026-03-31","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":13,"PILAR":"Base Jurídica","RUBRO_ID":"J4","RUBRO_NUM":1.4,"RUBRO_NOMBRE":"Proceso de Desafectación","ACT_ID":"J4-A5","ACTIVIDAD":"Publicación en el Periódico Oficial","SUBACTIVIDAD":"Publicación del Periódico Oficial","RESPONSABLE":"Consejería Jurídica","FECHA_INICIO":"2026-04-01","FECHA_FIN":"2026-04-01","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":14,"PILAR":"Base Jurídica","RUBRO_ID":"J5","RUBRO_NUM":1.5,"RUBRO_NOMBRE":"Proceso de Desincorporación","ACT_ID":"J5-A1","ACTIVIDAD":"Proyecto de Decreto","SUBACTIVIDAD":"Entrega de publicación, exposición de motivos y expedientes de terrenos","RESPONSABLE":"SAF / Patrimonio","FECHA_INICIO":"2026-04-06","FECHA_FIN":"2026-04-06","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":15,"PILAR":"Base Jurídica","RUBRO_ID":"J5","RUBRO_NUM":1.5,"RUBRO_NOMBRE":"Proceso de Desincorporación","ACT_ID":"J5-A2","ACTIVIDAD":"Proyecto de Decreto","SUBACTIVIDAD":"Elaboración de iniciativa","RESPONSABLE":"Consejería Jurídica","FECHA_INICIO":"2026-04-07","FECHA_FIN":"2026-04-07","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":16,"PILAR":"Base Jurídica","RUBRO_ID":"J5","RUBRO_NUM":1.5,"RUBRO_NOMBRE":"Proceso de Desincorporación","ACT_ID":"J5-A3","ACTIVIDAD":"Proyecto de Decreto","SUBACTIVIDAD":"Gestión de iniciativa","RESPONSABLE":"Consejería Jurídica","FECHA_INICIO":"2026-04-07","FECHA_FIN":"2026-04-07","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":17,"PILAR":"Base Jurídica","RUBRO_ID":"J5","RUBRO_NUM":1.5,"RUBRO_NOMBRE":"Proceso de Desincorporación","ACT_ID":"J5-A4","ACTIVIDAD":"Autorización legislativa para la Desincorporación ante el Congreso del Estado","SUBACTIVIDAD":"(Congreso del Estado)","RESPONSABLE":"Congreso del Estado","FECHA_INICIO":"2026-04-07","FECHA_FIN":"2026-04-21","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":18,"PILAR":"Base Jurídica","RUBRO_ID":"J6","RUBRO_NUM":1.6,"RUBRO_NOMBRE":"Expediente de Terrenos","ACT_ID":"J6-A1","ACTIVIDAD":"Segregación y escrituración de predios a nombre del Gobierno del Estado","SUBACTIVIDAD":"Parque Tabasco; Aparceros, Olimpia XXI (los tiempos dependerá del proceso de donación de los terrenos)","RESPONSABLE":"SAF / Patrimonio","FECHA_INICIO":"2026-04-21","FECHA_FIN":"2026-05-05","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":19,"PILAR":"Base Jurídica","RUBRO_ID":"J7","RUBRO_NUM":1.7,"RUBRO_NOMBRE":"Enajenación del Bien (Licitación Pública)","ACT_ID":"J7-A1","ACTIVIDAD":"Solicitud de Avalúo","SUBACTIVIDAD":"(Rango de 45 días para la licitación pública)","RESPONSABLE":"SAF / Patrimonio","FECHA_INICIO":"2026-05-05","FECHA_FIN":"2026-06-24","ESTADO":"Pendiente","PRIORIDAD":"Baja"},{"ID":20,"PILAR":"Base Jurídica","RUBRO_ID":"J7","RUBRO_NUM":1.7,"RUBRO_NOMBRE":"Enajenación del Bien (Licitación Pública)","ACT_ID":"J7-A2","ACTIVIDAD":"Convocatoria pública","SUBACTIVIDAD":"(Rango de 45 días para la licitación pública)","RESPONSABLE":"SAF","FECHA_INICIO":"2026-05-05","FECHA_FIN":"2026-06-24","ESTADO":"Pendiente","PRIORIDAD":"Baja"},{"ID":42,"PILAR":"Base Jurídica","RUBRO_ID":"J7","RUBRO_NUM":1.7,"RUBRO_NOMBRE":"Enajenación del Bien (Licitación Pública)","ACT_ID":"J7-A3","ACTIVIDAD":"Proceso de adjudicación","SUBACTIVIDAD":"(Rango de 45 días para la licitación pública)","RESPONSABLE":"Comité de Licitación","FECHA_INICIO":"2026-05-05","FECHA_FIN":"2026-06-24","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":43,"PILAR":"Base Jurídica","RUBRO_ID":"J7","RUBRO_NUM":1.7,"RUBRO_NOMBRE":"Enajenación del Bien (Licitación Pública)","ACT_ID":"J7-A4","ACTIVIDAD":"Formalización de contratos","SUBACTIVIDAD":"(Rango de 45 días para la licitación pública)","RESPONSABLE":"Consejería Jurídica","FECHA_INICIO":"2026-05-05","FECHA_FIN":"2026-06-24","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":44,"PILAR":"Base Jurídica","RUBRO_ID":"J7","RUBRO_NUM":1.7,"RUBRO_NOMBRE":"Enajenación del Bien (Licitación Pública)","ACT_ID":"J7-A5","ACTIVIDAD":"Formalización de contratos","SUBACTIVIDAD":"Firma de contrato de escritura (periodo estimado)","RESPONSABLE":"Inversionista","FECHA_INICIO":"2026-06-24","FECHA_FIN":"2026-07-08","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":21,"PILAR":"Base Técnica","RUBRO_ID":"T1","RUBRO_NUM":2.1,"RUBRO_NOMBRE":"Programa de Desarrollo Urbano","ACT_ID":"T1-A1","ACTIVIDAD":"Desarrollo de anteproyecto","SUBACTIVIDAD":"Desarrollo de anteproyecto","RESPONSABLE":"Consultor","FECHA_INICIO":"2025-11-26","FECHA_FIN":"2026-10-16","ESTADO":"En Proceso","PRIORIDAD":"Alta"},{"ID":22,"PILAR":"Base Técnica","RUBRO_ID":"T1","RUBRO_NUM":2.1,"RUBRO_NOMBRE":"Programa de Desarrollo Urbano","ACT_ID":"T1-A2","ACTIVIDAD":"Desarrollo de anteproyecto","SUBACTIVIDAD":"Primer borrador del anteproyecto","RESPONSABLE":"Consultor","FECHA_INICIO":"2026-03-18","FECHA_FIN":"2026-03-18","ESTADO":"En Proceso","PRIORIDAD":"Alta"},{"ID":23,"PILAR":"Base Técnica","RUBRO_ID":"T1","RUBRO_NUM":2.1,"RUBRO_NOMBRE":"Programa de Desarrollo Urbano","ACT_ID":"T1-A3","ACTIVIDAD":"Anteproyecto","SUBACTIVIDAD":"Entrega del Anteproyecto a los ayuntamientos de Centro y Nacajuca","RESPONSABLE":"SOTOP","FECHA_INICIO":"2026-10-16","FECHA_FIN":"2026-10-16","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":24,"PILAR":"Base Técnica","RUBRO_ID":"T1","RUBRO_NUM":2.1,"RUBRO_NOMBRE":"Programa de Desarrollo Urbano","ACT_ID":"T1-A4","ACTIVIDAD":"Anteproyecto","SUBACTIVIDAD":"Aprobación de los Ayuntamientos","RESPONSABLE":"Ayuntamientos","FECHA_INICIO":"2026-10-19","FECHA_FIN":"2026-10-23","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":25,"PILAR":"Base Comercial","RUBRO_ID":"C1","RUBRO_NUM":3.1,"RUBRO_NOMBRE":"Comercialización – Proceso de Venta","ACT_ID":"C1-A1","ACTIVIDAD":"Diseño del mecanismo de comercialización","SUBACTIVIDAD":"","RESPONSABLE":"SAF","FECHA_INICIO":"2026-02-07","FECHA_FIN":"2026-03-17","ESTADO":"En Proceso","PRIORIDAD":"Media"},{"ID":26,"PILAR":"Base Comercial","RUBRO_ID":"C1","RUBRO_NUM":3.1,"RUBRO_NOMBRE":"Comercialización – Proceso de Venta","ACT_ID":"C1-A2","ACTIVIDAD":"Diseño del mecanismo de comercialización","SUBACTIVIDAD":"Definición de precios base y esquema de venta","RESPONSABLE":"SAF","FECHA_INICIO":"2026-02-16","FECHA_FIN":"2026-03-13","ESTADO":"En Proceso","PRIORIDAD":"Alta"},{"ID":27,"PILAR":"Base Comercial","RUBRO_ID":"C1","RUBRO_NUM":3.1,"RUBRO_NOMBRE":"Comercialización – Proceso de Venta","ACT_ID":"C1-A3","ACTIVIDAD":"Diseño del mecanismo de comercialización","SUBACTIVIDAD":"Elaboración de portafolio / catálogo de inversión","RESPONSABLE":"SAF","FECHA_INICIO":"2026-03-12","FECHA_FIN":"2026-03-31","ESTADO":"Pendiente","PRIORIDAD":"Media"},{"ID":28,"PILAR":"Base Comercial","RUBRO_ID":"C1","RUBRO_NUM":3.1,"RUBRO_NOMBRE":"Comercialización – Proceso de Venta","ACT_ID":"C1-A4","ACTIVIDAD":"Diseño del mecanismo de comercialización","SUBACTIVIDAD":"Segmentación de mercado objetivo","RESPONSABLE":"SAF","FECHA_INICIO":"2026-02-26","FECHA_FIN":"2026-03-17","ESTADO":"En Proceso","PRIORIDAD":"Media"},{"ID":29,"PILAR":"Base Comercial","RUBRO_ID":"C1","RUBRO_NUM":3.1,"RUBRO_NOMBRE":"Comercialización – Proceso de Venta","ACT_ID":"C1-A5","ACTIVIDAD":"Socialización del Proyecto","SUBACTIVIDAD":"Gestión con vecinos y comunidades colindantes","RESPONSABLE":"SAF","FECHA_INICIO":"","FECHA_FIN":"","ESTADO":"Pendiente","PRIORIDAD":"Media"},{"ID":30,"PILAR":"Base Comercial","RUBRO_ID":"C1","RUBRO_NUM":3.1,"RUBRO_NOMBRE":"Comercialización – Proceso de Venta","ACT_ID":"C1-A6","ACTIVIDAD":"Socialización del Proyecto","SUBACTIVIDAD":"Difusión con grupos de interés","RESPONSABLE":"SAF","FECHA_INICIO":"2026-03-02","FECHA_FIN":"2026-09-30","ESTADO":"En Proceso","PRIORIDAD":"Alta"},{"ID":31,"PILAR":"Base Comercial","RUBRO_ID":"C1","RUBRO_NUM":3.1,"RUBRO_NOMBRE":"Comercialización – Proceso de Venta","ACT_ID":"C1-A7","ACTIVIDAD":"Socialización del Proyecto","SUBACTIVIDAD":"Comunicación pública constante","RESPONSABLE":"SAF","FECHA_INICIO":"2026-01-02","FECHA_FIN":"2026-12-31","ESTADO":"En Proceso","PRIORIDAD":"Alta"},{"ID":32,"PILAR":"Base Comercial","RUBRO_ID":"C1","RUBRO_NUM":3.1,"RUBRO_NOMBRE":"Comercialización – Proceso de Venta","ACT_ID":"C1-A8","ACTIVIDAD":"Prospección de Inversionistas","SUBACTIVIDAD":"Roadshow nacional e internacional","RESPONSABLE":"SAF","FECHA_INICIO":"2026-04-06","FECHA_FIN":"2026-12-31","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":33,"PILAR":"Base Comercial","RUBRO_ID":"C1","RUBRO_NUM":3.1,"RUBRO_NOMBRE":"Comercialización – Proceso de Venta","ACT_ID":"C1-A9","ACTIVIDAD":"Prospección de Inversionistas","SUBACTIVIDAD":"Presentaciones ejecutivas","RESPONSABLE":"SAF","FECHA_INICIO":"2026-02-07","FECHA_FIN":"2026-12-31","ESTADO":"En Proceso","PRIORIDAD":"Alta"},{"ID":34,"PILAR":"Base Comercial","RUBRO_ID":"C1","RUBRO_NUM":3.1,"RUBRO_NOMBRE":"Comercialización – Proceso de Venta","ACT_ID":"C1-A10","ACTIVIDAD":"Prospección de Inversionistas","SUBACTIVIDAD":"Firma de NDA (Acuerdo de Confidencialidad)","RESPONSABLE":"SAF","FECHA_INICIO":"2026-02-20","FECHA_FIN":"2026-04-30","ESTADO":"En Proceso","PRIORIDAD":"Alta"},{"ID":35,"PILAR":"Base Comercial","RUBRO_ID":"C1","RUBRO_NUM":3.1,"RUBRO_NOMBRE":"Comercialización – Proceso de Venta","ACT_ID":"C1-A11","ACTIVIDAD":"Manifestación Formal de Interés","SUBACTIVIDAD":"Due diligence","RESPONSABLE":"Inversionista","FECHA_INICIO":"2026-02-20","FECHA_FIN":"2026-04-30","ESTADO":"En Proceso","PRIORIDAD":"Alta"},{"ID":36,"PILAR":"Base Comercial","RUBRO_ID":"C1","RUBRO_NUM":3.1,"RUBRO_NOMBRE":"Comercialización – Proceso de Venta","ACT_ID":"C1-A12","ACTIVIDAD":"Manifestación Formal de Interés","SUBACTIVIDAD":"Carta de intención","RESPONSABLE":"Inversionista","FECHA_INICIO":"2026-02-20","FECHA_FIN":"2026-04-30","ESTADO":"En Proceso","PRIORIDAD":"Alta"},{"ID":37,"PILAR":"Base Comercial","RUBRO_ID":"C1","RUBRO_NUM":3.1,"RUBRO_NOMBRE":"Comercialización – Proceso de Venta","ACT_ID":"C1-A13","ACTIVIDAD":"Manifestación Formal de Interés","SUBACTIVIDAD":"Proyecto conceptual","RESPONSABLE":"Inversionista","FECHA_INICIO":"2026-05-05","FECHA_FIN":"2026-05-05","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":38,"PILAR":"Base Comercial","RUBRO_ID":"C1","RUBRO_NUM":3.1,"RUBRO_NOMBRE":"Comercialización – Proceso de Venta","ACT_ID":"C1-A14","ACTIVIDAD":"Negociación de Condiciones","SUBACTIVIDAD":"Evaluación técnica y financiera","RESPONSABLE":"SAF","FECHA_INICIO":"2026-05-05","FECHA_FIN":"2026-06-24","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":39,"PILAR":"Base Comercial","RUBRO_ID":"C1","RUBRO_NUM":3.1,"RUBRO_NOMBRE":"Comercialización – Proceso de Venta","ACT_ID":"C1-A15","ACTIVIDAD":"Negociación de Condiciones","SUBACTIVIDAD":"Elaboración de dictamen","RESPONSABLE":"SAF","FECHA_INICIO":"2026-05-05","FECHA_FIN":"2026-06-24","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":40,"PILAR":"Base Comercial","RUBRO_ID":"C1","RUBRO_NUM":3.1,"RUBRO_NOMBRE":"Comercialización – Proceso de Venta","ACT_ID":"C1-A16","ACTIVIDAD":"Negociación de Condiciones","SUBACTIVIDAD":"Negociación final de condiciones","RESPONSABLE":"SAF","FECHA_INICIO":"2026-05-05","FECHA_FIN":"2026-06-24","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":41,"PILAR":"Base Comercial","RUBRO_ID":"C1","RUBRO_NUM":3.1,"RUBRO_NOMBRE":"Comercialización – Proceso de Venta","ACT_ID":"C1-A17","ACTIVIDAD":"Negociación de Condiciones","SUBACTIVIDAD":"Depósito en garantía","RESPONSABLE":"Inversionista","FECHA_INICIO":"2026-05-05","FECHA_FIN":"2026-06-24","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":45,"PILAR":"Base Comercial","RUBRO_ID":"C1","RUBRO_NUM":3.1,"RUBRO_NOMBRE":"Comercialización – Proceso de Venta","ACT_ID":"C1-A18","ACTIVIDAD":"Proceso de adjudicación","SUBACTIVIDAD":"Firma ante notario público","RESPONSABLE":"Inversionista","FECHA_INICIO":"2026-07-09","FECHA_FIN":"2026-07-23","ESTADO":"Pendiente","PRIORIDAD":"Alta"}];
+/* ═══════ DATA ═══════ */
+let DATA=[{"ID":1,"PILAR":"Base Jurídica","RUBRO_ID":"J1","RUBRO_NUM":1.1,"RUBRO_NOMBRE":"Justificación del Desarrollo Económico y Turistico","ACT_ID":"J1-A1","ACTIVIDAD":"Justificación del Desarrollo Económico y Turistico","SUBACTIVIDAD":"Solicitud del Plan Maestro a SOTOP","RESPONSABLE":"TURISMO","FECHA_INICIO":"2026-03-09","FECHA_FIN":"2026-03-09","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":2,"PILAR":"Base Jurídica","RUBRO_ID":"J1","RUBRO_NUM":1.1,"RUBRO_NOMBRE":"Justificación del Desarrollo Económico y Turistico","ACT_ID":"J1-A2","ACTIVIDAD":"Justificación del Desarrollo Económico y Turistico","SUBACTIVIDAD":"Respuesta de SOTOP","RESPONSABLE":"SOTOP","FECHA_INICIO":"2026-03-10","FECHA_FIN":"2026-03-10","ESTADO":"En Proceso","PRIORIDAD":"Alta"},{"ID":3,"PILAR":"Base Jurídica","RUBRO_ID":"J2","RUBRO_NUM":1.2,"RUBRO_NOMBRE":"Solicitud de Enajenación","ACT_ID":"J2-A1","ACTIVIDAD":"Oficio de solicitud para la enajenación de terrenos","SUBACTIVIDAD":"Oficio de solicitud para la enajenación de terrenos a SAF","RESPONSABLE":"TURISMO","FECHA_INICIO":"2026-03-11","FECHA_FIN":"2026-03-11","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":4,"PILAR":"Base Jurídica","RUBRO_ID":"J3","RUBRO_NUM":1.3,"RUBRO_NOMBRE":"Donación de Terrenos","ACT_ID":"J3-A1","ACTIVIDAD":"Proceso de donación de Terrenos","SUBACTIVIDAD":"Solicitud de donación","RESPONSABLE":"SAF / Patrimonio","FECHA_INICIO":"","FECHA_FIN":"","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":5,"PILAR":"Base Jurídica","RUBRO_ID":"J3","RUBRO_NUM":1.3,"RUBRO_NOMBRE":"Donación de Terrenos","ACT_ID":"J3-A2","ACTIVIDAD":"Proceso de donación de Terrenos","SUBACTIVIDAD":"Se realiza el dictamen técnico","RESPONSABLE":"INVITAB","FECHA_INICIO":"","FECHA_FIN":"","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":6,"PILAR":"Base Jurídica","RUBRO_ID":"J3","RUBRO_NUM":1.3,"RUBRO_NOMBRE":"Donación de Terrenos","ACT_ID":"J3-A3","ACTIVIDAD":"Proceso de donación de Terrenos","SUBACTIVIDAD":"Se somete a Consejo de Administración para su aprobación","RESPONSABLE":"INVITAB","FECHA_INICIO":"","FECHA_FIN":"","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":7,"PILAR":"Base Jurídica","RUBRO_ID":"J3","RUBRO_NUM":1.3,"RUBRO_NOMBRE":"Donación de Terrenos","ACT_ID":"J3-A4","ACTIVIDAD":"Proceso de donación de Terrenos","SUBACTIVIDAD":"Se notifica al solicitante la autorización para que proceda a presentar al notario que realizará el instrumento de donación","RESPONSABLE":"INVITAB","FECHA_INICIO":"","FECHA_FIN":"","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":8,"PILAR":"Base Jurídica","RUBRO_ID":"J3","RUBRO_NUM":1.3,"RUBRO_NOMBRE":"Donación de Terrenos","ACT_ID":"J3-A5","ACTIVIDAD":"Proceso de donación de Terrenos","SUBACTIVIDAD":"Escrituración del terreno","RESPONSABLE":"Notario Público","FECHA_INICIO":"","FECHA_FIN":"","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":9,"PILAR":"Base Jurídica","RUBRO_ID":"J4","RUBRO_NUM":1.4,"RUBRO_NOMBRE":"Proceso de Desafectación","ACT_ID":"J4-A1","ACTIVIDAD":"Elaboración de dictamen jurídico de desafectación","SUBACTIVIDAD":"Solicitud de opinión técnica y levantamiento topográfico a SOTOP","RESPONSABLE":"SAF / Patrimonio","FECHA_INICIO":"2026-03-12","FECHA_FIN":"2026-03-12","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":10,"PILAR":"Base Jurídica","RUBRO_ID":"J4","RUBRO_NUM":1.4,"RUBRO_NOMBRE":"Proceso de Desafectación","ACT_ID":"J4-A2","ACTIVIDAD":"Concentración de documentación registral","SUBACTIVIDAD":"Certificado de existencia o inexistencia de gravamen, historia registral y copias certificadas de las escrituras públicas","RESPONSABLE":"SAF / Patrimonio","FECHA_INICIO":"2026-03-12","FECHA_FIN":"2026-03-12","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":11,"PILAR":"Base Jurídica","RUBRO_ID":"J4","RUBRO_NUM":1.4,"RUBRO_NOMBRE":"Proceso de Desafectación","ACT_ID":"J4-A3","ACTIVIDAD":"Elaboración de dictamen jurídico de desafectación","SUBACTIVIDAD":"Respuesta de opinión técnica y levantamiento topográfico a Patrimonio","RESPONSABLE":"SOTOP","FECHA_INICIO":"2026-03-31","FECHA_FIN":"2026-03-31","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":12,"PILAR":"Base Jurídica","RUBRO_ID":"J4","RUBRO_NUM":1.4,"RUBRO_NOMBRE":"Proceso de Desafectación","ACT_ID":"J4-A4","ACTIVIDAD":"Publicación en el Periódico Oficial","SUBACTIVIDAD":"Acuerdo administrativo para la desafectación del regimen del dominio público","RESPONSABLE":"SAF / Patrimonio","FECHA_INICIO":"2026-03-31","FECHA_FIN":"2026-03-31","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":13,"PILAR":"Base Jurídica","RUBRO_ID":"J4","RUBRO_NUM":1.4,"RUBRO_NOMBRE":"Proceso de Desafectación","ACT_ID":"J4-A5","ACTIVIDAD":"Publicación en el Periódico Oficial","SUBACTIVIDAD":"Publicación del Periódico Oficial","RESPONSABLE":"Consejería Jurídica","FECHA_INICIO":"2026-04-01","FECHA_FIN":"2026-04-01","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":14,"PILAR":"Base Jurídica","RUBRO_ID":"J5","RUBRO_NUM":1.5,"RUBRO_NOMBRE":"Proceso de Desincorporación","ACT_ID":"J5-A1","ACTIVIDAD":"Proyecto de Decreto","SUBACTIVIDAD":"Entrega de publicación, exposición de motivos y expedientes de terrenos","RESPONSABLE":"SAF / Patrimonio","FECHA_INICIO":"2026-04-06","FECHA_FIN":"2026-04-06","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":15,"PILAR":"Base Jurídica","RUBRO_ID":"J5","RUBRO_NUM":1.5,"RUBRO_NOMBRE":"Proceso de Desincorporación","ACT_ID":"J5-A2","ACTIVIDAD":"Proyecto de Decreto","SUBACTIVIDAD":"Elaboración de iniciativa","RESPONSABLE":"Consejería Jurídica","FECHA_INICIO":"2026-04-07","FECHA_FIN":"2026-04-07","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":16,"PILAR":"Base Jurídica","RUBRO_ID":"J5","RUBRO_NUM":1.5,"RUBRO_NOMBRE":"Proceso de Desincorporación","ACT_ID":"J5-A3","ACTIVIDAD":"Proyecto de Decreto","SUBACTIVIDAD":"Gestión de iniciativa","RESPONSABLE":"Consejería Jurídica","FECHA_INICIO":"2026-04-07","FECHA_FIN":"2026-04-07","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":17,"PILAR":"Base Jurídica","RUBRO_ID":"J5","RUBRO_NUM":1.5,"RUBRO_NOMBRE":"Proceso de Desincorporación","ACT_ID":"J5-A4","ACTIVIDAD":"Autorización legislativa para la Desincorporación ante el Congreso del Estado","SUBACTIVIDAD":"(Congreso del Estado)","RESPONSABLE":"Congreso del Estado","FECHA_INICIO":"2026-04-07","FECHA_FIN":"2026-04-21","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":18,"PILAR":"Base Jurídica","RUBRO_ID":"J6","RUBRO_NUM":1.6,"RUBRO_NOMBRE":"Expediente de Terrenos","ACT_ID":"J6-A1","ACTIVIDAD":"Segregación y escrituración de predios a nombre del Gobierno del Estado","SUBACTIVIDAD":"Parque Tabasco; Aparceros, Olimpia XXI (los tiempos dependerá del proceso de donación de los terrenos)","RESPONSABLE":"SAF / Patrimonio","FECHA_INICIO":"2026-04-21","FECHA_FIN":"2026-05-05","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":19,"PILAR":"Base Jurídica","RUBRO_ID":"J7","RUBRO_NUM":1.7,"RUBRO_NOMBRE":"Enajenación del Bien (Licitación Pública)","ACT_ID":"J7-A1","ACTIVIDAD":"Solicitud de Avalúo","SUBACTIVIDAD":"(Rango de 45 días para la licitación pública)","RESPONSABLE":"SAF / Patrimonio","FECHA_INICIO":"2026-05-05","FECHA_FIN":"2026-06-24","ESTADO":"Pendiente","PRIORIDAD":"Baja"},{"ID":20,"PILAR":"Base Jurídica","RUBRO_ID":"J7","RUBRO_NUM":1.7,"RUBRO_NOMBRE":"Enajenación del Bien (Licitación Pública)","ACT_ID":"J7-A2","ACTIVIDAD":"Convocatoria pública","SUBACTIVIDAD":"(Rango de 45 días para la licitación pública)","RESPONSABLE":"SAF","FECHA_INICIO":"2026-05-05","FECHA_FIN":"2026-06-24","ESTADO":"Pendiente","PRIORIDAD":"Baja"},{"ID":42,"PILAR":"Base Jurídica","RUBRO_ID":"J7","RUBRO_NUM":1.7,"RUBRO_NOMBRE":"Enajenación del Bien (Licitación Pública)","ACT_ID":"J7-A3","ACTIVIDAD":"Proceso de adjudicación","SUBACTIVIDAD":"(Rango de 45 días para la licitación pública)","RESPONSABLE":"Comité de Licitación","FECHA_INICIO":"2026-05-05","FECHA_FIN":"2026-06-24","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":43,"PILAR":"Base Jurídica","RUBRO_ID":"J7","RUBRO_NUM":1.7,"RUBRO_NOMBRE":"Enajenación del Bien (Licitación Pública)","ACT_ID":"J7-A4","ACTIVIDAD":"Formalización de contratos","SUBACTIVIDAD":"(Rango de 45 días para la licitación pública)","RESPONSABLE":"Consejería Jurídica","FECHA_INICIO":"2026-05-05","FECHA_FIN":"2026-06-24","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":44,"PILAR":"Base Jurídica","RUBRO_ID":"J7","RUBRO_NUM":1.7,"RUBRO_NOMBRE":"Enajenación del Bien (Licitación Pública)","ACT_ID":"J7-A5","ACTIVIDAD":"Formalización de contratos","SUBACTIVIDAD":"Firma de contrato de escritura (periodo estimado)","RESPONSABLE":"Inversionista","FECHA_INICIO":"2026-06-24","FECHA_FIN":"2026-07-08","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":21,"PILAR":"Base Técnica","RUBRO_ID":"T1","RUBRO_NUM":2.1,"RUBRO_NOMBRE":"Programa de Desarrollo Urbano","ACT_ID":"T1-A1","ACTIVIDAD":"Desarrollo de anteproyecto","SUBACTIVIDAD":"Desarrollo de anteproyecto","RESPONSABLE":"Consultor","FECHA_INICIO":"2025-11-26","FECHA_FIN":"2026-10-16","ESTADO":"En Proceso","PRIORIDAD":"Alta"},{"ID":22,"PILAR":"Base Técnica","RUBRO_ID":"T1","RUBRO_NUM":2.1,"RUBRO_NOMBRE":"Programa de Desarrollo Urbano","ACT_ID":"T1-A2","ACTIVIDAD":"Desarrollo de anteproyecto","SUBACTIVIDAD":"Primer borrador del anteproyecto","RESPONSABLE":"Consultor","FECHA_INICIO":"2026-03-18","FECHA_FIN":"2026-03-18","ESTADO":"En Proceso","PRIORIDAD":"Alta"},{"ID":23,"PILAR":"Base Técnica","RUBRO_ID":"T1","RUBRO_NUM":2.1,"RUBRO_NOMBRE":"Programa de Desarrollo Urbano","ACT_ID":"T1-A3","ACTIVIDAD":"Anteproyecto","SUBACTIVIDAD":"Entrega del Anteproyecto a los ayuntamientos de Centro y Nacajuca","RESPONSABLE":"SOTOP","FECHA_INICIO":"2026-10-16","FECHA_FIN":"2026-10-16","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":24,"PILAR":"Base Técnica","RUBRO_ID":"T1","RUBRO_NUM":2.1,"RUBRO_NOMBRE":"Programa de Desarrollo Urbano","ACT_ID":"T1-A4","ACTIVIDAD":"Anteproyecto","SUBACTIVIDAD":"Aprobación de los Ayuntamientos","RESPONSABLE":"Ayuntamientos","FECHA_INICIO":"2026-10-19","FECHA_FIN":"2026-10-23","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":25,"PILAR":"Base Comercial","RUBRO_ID":"C1","RUBRO_NUM":3.1,"RUBRO_NOMBRE":"Comercialización – Proceso de Venta","ACT_ID":"C1-A1","ACTIVIDAD":"Diseño del mecanismo de comercialización","SUBACTIVIDAD":"","RESPONSABLE":"SAF","FECHA_INICIO":"2026-02-07","FECHA_FIN":"2026-03-17","ESTADO":"En Proceso","PRIORIDAD":"Media"},{"ID":26,"PILAR":"Base Comercial","RUBRO_ID":"C1","RUBRO_NUM":3.1,"RUBRO_NOMBRE":"Comercialización – Proceso de Venta","ACT_ID":"C1-A2","ACTIVIDAD":"Diseño del mecanismo de comercialización","SUBACTIVIDAD":"Definición de precios base y esquema de venta","RESPONSABLE":"SAF","FECHA_INICIO":"2026-02-16","FECHA_FIN":"2026-03-13","ESTADO":"En Proceso","PRIORIDAD":"Alta"},{"ID":27,"PILAR":"Base Comercial","RUBRO_ID":"C1","RUBRO_NUM":3.1,"RUBRO_NOMBRE":"Comercialización – Proceso de Venta","ACT_ID":"C1-A3","ACTIVIDAD":"Diseño del mecanismo de comercialización","SUBACTIVIDAD":"Elaboración de portafolio / catálogo de inversión","RESPONSABLE":"SAF","FECHA_INICIO":"2026-03-12","FECHA_FIN":"2026-03-31","ESTADO":"Pendiente","PRIORIDAD":"Media"},{"ID":28,"PILAR":"Base Comercial","RUBRO_ID":"C1","RUBRO_NUM":3.1,"RUBRO_NOMBRE":"Comercialización – Proceso de Venta","ACT_ID":"C1-A4","ACTIVIDAD":"Diseño del mecanismo de comercialización","SUBACTIVIDAD":"Segmentación de mercado objetivo","RESPONSABLE":"SAF","FECHA_INICIO":"2026-02-26","FECHA_FIN":"2026-03-17","ESTADO":"En Proceso","PRIORIDAD":"Media"},{"ID":29,"PILAR":"Base Comercial","RUBRO_ID":"C1","RUBRO_NUM":3.1,"RUBRO_NOMBRE":"Comercialización – Proceso de Venta","ACT_ID":"C1-A5","ACTIVIDAD":"Socialización del Proyecto","SUBACTIVIDAD":"Gestión con vecinos y comunidades colindantes","RESPONSABLE":"SAF","FECHA_INICIO":"","FECHA_FIN":"","ESTADO":"Pendiente","PRIORIDAD":"Media"},{"ID":30,"PILAR":"Base Comercial","RUBRO_ID":"C1","RUBRO_NUM":3.1,"RUBRO_NOMBRE":"Comercialización – Proceso de Venta","ACT_ID":"C1-A6","ACTIVIDAD":"Socialización del Proyecto","SUBACTIVIDAD":"Difusión con grupos de interés","RESPONSABLE":"SAF","FECHA_INICIO":"2026-03-02","FECHA_FIN":"2026-09-30","ESTADO":"En Proceso","PRIORIDAD":"Alta"},{"ID":31,"PILAR":"Base Comercial","RUBRO_ID":"C1","RUBRO_NUM":3.1,"RUBRO_NOMBRE":"Comercialización – Proceso de Venta","ACT_ID":"C1-A7","ACTIVIDAD":"Socialización del Proyecto","SUBACTIVIDAD":"Comunicación pública constante","RESPONSABLE":"SAF","FECHA_INICIO":"2026-01-02","FECHA_FIN":"2026-12-31","ESTADO":"En Proceso","PRIORIDAD":"Alta"},{"ID":32,"PILAR":"Base Comercial","RUBRO_ID":"C1","RUBRO_NUM":3.1,"RUBRO_NOMBRE":"Comercialización – Proceso de Venta","ACT_ID":"C1-A8","ACTIVIDAD":"Prospección de Inversionistas","SUBACTIVIDAD":"Roadshow nacional e internacional","RESPONSABLE":"SAF","FECHA_INICIO":"2026-04-06","FECHA_FIN":"2026-12-31","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":33,"PILAR":"Base Comercial","RUBRO_ID":"C1","RUBRO_NUM":3.1,"RUBRO_NOMBRE":"Comercialización – Proceso de Venta","ACT_ID":"C1-A9","ACTIVIDAD":"Prospección de Inversionistas","SUBACTIVIDAD":"Presentaciones ejecutivas","RESPONSABLE":"SAF","FECHA_INICIO":"2026-02-07","FECHA_FIN":"2026-12-31","ESTADO":"En Proceso","PRIORIDAD":"Alta"},{"ID":34,"PILAR":"Base Comercial","RUBRO_ID":"C1","RUBRO_NUM":3.1,"RUBRO_NOMBRE":"Comercialización – Proceso de Venta","ACT_ID":"C1-A10","ACTIVIDAD":"Prospección de Inversionistas","SUBACTIVIDAD":"Firma de NDA (Acuerdo de Confidencialidad)","RESPONSABLE":"SAF","FECHA_INICIO":"2026-02-20","FECHA_FIN":"2026-04-30","ESTADO":"En Proceso","PRIORIDAD":"Alta"},{"ID":35,"PILAR":"Base Comercial","RUBRO_ID":"C1","RUBRO_NUM":3.1,"RUBRO_NOMBRE":"Comercialización – Proceso de Venta","ACT_ID":"C1-A11","ACTIVIDAD":"Manifestación Formal de Interés","SUBACTIVIDAD":"Due diligence","RESPONSABLE":"Inversionista","FECHA_INICIO":"2026-02-20","FECHA_FIN":"2026-04-30","ESTADO":"En Proceso","PRIORIDAD":"Alta"},{"ID":36,"PILAR":"Base Comercial","RUBRO_ID":"C1","RUBRO_NUM":3.1,"RUBRO_NOMBRE":"Comercialización – Proceso de Venta","ACT_ID":"C1-A12","ACTIVIDAD":"Manifestación Formal de Interés","SUBACTIVIDAD":"Carta de intención","RESPONSABLE":"Inversionista","FECHA_INICIO":"2026-02-20","FECHA_FIN":"2026-04-30","ESTADO":"En Proceso","PRIORIDAD":"Alta"},{"ID":37,"PILAR":"Base Comercial","RUBRO_ID":"C1","RUBRO_NUM":3.1,"RUBRO_NOMBRE":"Comercialización – Proceso de Venta","ACT_ID":"C1-A13","ACTIVIDAD":"Manifestación Formal de Interés","SUBACTIVIDAD":"Proyecto conceptual","RESPONSABLE":"Inversionista","FECHA_INICIO":"2026-05-05","FECHA_FIN":"2026-05-05","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":38,"PILAR":"Base Comercial","RUBRO_ID":"C1","RUBRO_NUM":3.1,"RUBRO_NOMBRE":"Comercialización – Proceso de Venta","ACT_ID":"C1-A14","ACTIVIDAD":"Negociación de Condiciones","SUBACTIVIDAD":"Evaluación técnica y financiera","RESPONSABLE":"SAF","FECHA_INICIO":"2026-05-05","FECHA_FIN":"2026-06-24","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":39,"PILAR":"Base Comercial","RUBRO_ID":"C1","RUBRO_NUM":3.1,"RUBRO_NOMBRE":"Comercialización – Proceso de Venta","ACT_ID":"C1-A15","ACTIVIDAD":"Negociación de Condiciones","SUBACTIVIDAD":"Elaboración de dictamen","RESPONSABLE":"SAF","FECHA_INICIO":"2026-05-05","FECHA_FIN":"2026-06-24","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":40,"PILAR":"Base Comercial","RUBRO_ID":"C1","RUBRO_NUM":3.1,"RUBRO_NOMBRE":"Comercialización – Proceso de Venta","ACT_ID":"C1-A16","ACTIVIDAD":"Negociación de Condiciones","SUBACTIVIDAD":"Negociación final de condiciones","RESPONSABLE":"SAF","FECHA_INICIO":"2026-05-05","FECHA_FIN":"2026-06-24","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":41,"PILAR":"Base Comercial","RUBRO_ID":"C1","RUBRO_NUM":3.1,"RUBRO_NOMBRE":"Comercialización – Proceso de Venta","ACT_ID":"C1-A17","ACTIVIDAD":"Negociación de Condiciones","SUBACTIVIDAD":"Depósito en garantía","RESPONSABLE":"Inversionista","FECHA_INICIO":"2026-05-05","FECHA_FIN":"2026-06-24","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":45,"PILAR":"Base Comercial","RUBRO_ID":"C1","RUBRO_NUM":3.1,"RUBRO_NOMBRE":"Comercialización – Proceso de Venta","ACT_ID":"C1-A18","ACTIVIDAD":"Proceso de adjudicación","SUBACTIVIDAD":"Firma ante notario público","RESPONSABLE":"Inversionista","FECHA_INICIO":"2026-07-09","FECHA_FIN":"2026-07-23","ESTADO":"Pendiente","PRIORIDAD":"Alta"},{"ID":46,"PILAR":"Base Financiera","RUBRO_ID":"F1","RUBRO_NUM":4.1,"RUBRO_NOMBRE":"Avalúos e Identificación de Valor","ACT_ID":"F1-A1","ACTIVIDAD":"Avalúos comerciales de los predios","SUBACTIVIDAD":"","RESPONSABLE":"SAF","FECHA_INICIO":"2026-06-24","FECHA_FIN":"2026-07-10","ESTADO":"Pendiente","PRIORIDAD":"Media"},{"ID":47,"PILAR":"Base Financiera","RUBRO_ID":"F1","RUBRO_NUM":4.1,"RUBRO_NOMBRE":"Avalúos e Identificación de Valor","ACT_ID":"F1-A2","ACTIVIDAD":"Análisis de valor por metro cuadrado","SUBACTIVIDAD":"","RESPONSABLE":"SAF","FECHA_INICIO":"2026-06-24","FECHA_FIN":"2026-07-10","ESTADO":"Pendiente","PRIORIDAD":"Media"},{"ID":48,"PILAR":"Base Financiera","RUBRO_ID":"F1","RUBRO_NUM":4.1,"RUBRO_NOMBRE":"Avalúos e Identificación de Valor","ACT_ID":"F1-A3","ACTIVIDAD":"Identificación de plusvalía proyectada","SUBACTIVIDAD":"","RESPONSABLE":"SAF","FECHA_INICIO":"2026-06-24","FECHA_FIN":"2026-07-10","ESTADO":"Pendiente","PRIORIDAD":"Media"},{"ID":49,"PILAR":"Base Financiera","RUBRO_ID":"F2","RUBRO_NUM":4.2,"RUBRO_NOMBRE":"Proyección y Gestión de Ingresos","ACT_ID":"F2-A1","ACTIVIDAD":"Proyección de ingresos por venta de la tierra","SUBACTIVIDAD":"","RESPONSABLE":"SAF","FECHA_INICIO":"2026-03-06","FECHA_FIN":"2026-03-31","ESTADO":"Pendiente","PRIORIDAD":"Media"},{"ID":50,"PILAR":"Base Financiera","RUBRO_ID":"F2","RUBRO_NUM":4.2,"RUBRO_NOMBRE":"Proyección y Gestión de Ingresos","ACT_ID":"F2-A2","ACTIVIDAD":"Proceso de ampliación de ingresos","SUBACTIVIDAD":"","RESPONSABLE":"SAF","FECHA_INICIO":"2026-03-06","FECHA_FIN":"2026-03-31","ESTADO":"Pendiente","PRIORIDAD":"Media"},{"ID":51,"PILAR":"Base Financiera","RUBRO_ID":"F2","RUBRO_NUM":4.2,"RUBRO_NOMBRE":"Proyección y Gestión de Ingresos","ACT_ID":"F2-A3","ACTIVIDAD":"Suficiencia presupuestal","SUBACTIVIDAD":"","RESPONSABLE":"SAF","FECHA_INICIO":"2026-03-06","FECHA_FIN":"2026-03-31","ESTADO":"Pendiente","PRIORIDAD":"Media"},{"ID":52,"PILAR":"Base Financiera","RUBRO_ID":"F2","RUBRO_NUM":4.2,"RUBRO_NOMBRE":"Proyección y Gestión de Ingresos","ACT_ID":"F2-A4","ACTIVIDAD":"Proceso de adquisición de deuda","SUBACTIVIDAD":"","RESPONSABLE":"SAF","FECHA_INICIO":"2026-03-09","FECHA_FIN":"2026-04-30","ESTADO":"Pendiente","PRIORIDAD":"Media"},{"ID":53,"PILAR":"Base Financiera","RUBRO_ID":"F3","RUBRO_NUM":4.3,"RUBRO_NOMBRE":"Ejecución Presupuestal y Obra","ACT_ID":"F3-A1","ACTIVIDAD":"Licitación de la obra","SUBACTIVIDAD":"","RESPONSABLE":"SAF / SOTOP","FECHA_INICIO":"2026-04-01","FECHA_FIN":"2026-05-20","ESTADO":"Pendiente","PRIORIDAD":"Media"},{"ID":54,"PILAR":"Base Financiera","RUBRO_ID":"F3","RUBRO_NUM":4.3,"RUBRO_NOMBRE":"Ejecución Presupuestal y Obra","ACT_ID":"F3-A2","ACTIVIDAD":"Pago de estimaciones de obra","SUBACTIVIDAD":"","RESPONSABLE":"SAF","FECHA_INICIO":"2026-05-31","FECHA_FIN":"2026-05-31","ESTADO":"Pendiente","PRIORIDAD":"Media"}];
 
-/* ═══════════════════════════════════════════════════
-   CONFIG
-═══════════════════════════════════════════════════ */
-const PILLARS = {
-  'Base Jurídica':  {key:'Juridico', color:'#991547', label:'Pilar Jurídico',  icon:'⚖', ord:0},
-  'Base Técnica':   {key:'Tecnico',  color:'#C49955', label:'Pilar Técnico',   icon:'🏗', ord:1},
-  'Base Comercial': {key:'Financiero',color:'#771139', label:'Pilar Financiero',icon:'💼', ord:2},
+/* ═══════ CONFIG ═══════ */
+const PCFG={
+  'Base Jurídica': {k:'J',c:'#991547',lbl:'Pilar Jurídico',ico:'⚖',ord:0},
+  'Base Técnica':  {k:'T',c:'#C49955',lbl:'Pilar Técnico', ico:'🏗',ord:1},
+  'Base Comercial':{k:'C',c:'#9a3558',lbl:'Pilar Comercial',ico:'💼',ord:2},
+  'Base Financiera':{k:'F',c:'#6b4fa0',lbl:'Pilar Financiero',ico:'📊',ord:3},
 };
-const STATUS_ORDER = ['Pendiente','En Proceso','Revisión','Completado','Bloqueado'];
-const PRIO_ORDER   = ['Alta','Media','Baja'];
+const SORD=['Pendiente','En Proceso','Revisión','Completado','Bloqueado'];
+const PORD=['Alta','Media','Baja'];
 
-/* ═══════════════════════════════════════════════════
-   STATE
-═══════════════════════════════════════════════════ */
-let state = {
-  pilar: 'all', search: '', estado: '', prio: '',
-  view: 'lista',
-  collPillar: {}, collRubro: {},
-  editId: null, isNew: false,
-  nextId: 1000,
-};
+/* ═══════ STATE ═══════ */
+let S={pilar:'all',srch:'',est:'',pri:'',view:'l',
+  colP:{},colR:{},editId:null,isNew:false,
+  _np:'',_nr:'',_rnum:0,_rnm:'',nextId:2000};
 
-/* ═══════════════════════════════════════════════════
-   HELPERS
-═══════════════════════════════════════════════════ */
-const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-const fmtD = d => {if(!d)return'—';const[y,m,dd]=d.split('-');return`${dd}/${m}/${y.slice(2)}`};
-const sBadge = (s,id) => {
-  const map = {Pendiente:'s-pend',  'En Proceso':'s-proc', Revisión:'s-rev', Completado:'s-comp', Bloqueado:'s-bloq'};
-  return `<span class="badge-s ${map[s]||'s-pend'}" onclick="cycleS(${id});event.stopPropagation()">${esc(s)}</span>`;
-};
-const pBadge = (p,id) => {
-  const map = {Alta:'p-alta',Media:'p-media',Baja:'p-baja'};
-  return `<span class="badge-p ${map[p]||'p-baja'}" onclick="cycleP(${id});event.stopPropagation()">${esc(p)}</span>`;
-};
+/* ═══════ HELPERS ═══════ */
+const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const fd=d=>{if(!d)return'—';const[y,m,dd]=d.split('-');return`${dd}/${m}/${y.slice(2)}`};
+const smap={Pendiente:'sp','En Proceso':'se',Revisión:'sr',Completado:'sc',Bloqueado:'sb'};
+const pmap={Alta:'bpa',Media:'bpm',Baja:'bpb'};
+const sbdg=(s,id)=>`<span class="bs ${smap[s]||'sp'}" onclick="cycS(${id});event.stopPropagation()">${esc(s)}</span>`;
+const pbdg=(p,id)=>`<span class="bp ${pmap[p]||'bpb'}" onclick="cycP(${id});event.stopPropagation()">${esc(p)}</span>`;
 
-function getFiltered(){
+function getFilt(){
   return DATA.filter(d=>{
-    const pk = PILLARS[d.PILAR]?.key;
-    if(state.pilar!=='all' && pk!==state.pilar) return false;
-    if(state.estado && d.ESTADO!==state.estado) return false;
-    if(state.prio   && d.PRIORIDAD!==state.prio) return false;
-    if(state.search){
-      const txt=(d.ACTIVIDAD+d.SUBACTIVIDAD+d.RESPONSABLE+d.RUBRO_NOMBRE).toLowerCase();
-      if(!txt.includes(state.search.toLowerCase())) return false;
-    }
+    const pk=PCFG[d.PILAR]?.k;
+    if(S.pilar!=='all'&&pk!==S.pilar)return false;
+    if(S.est&&d.ESTADO!==S.est)return false;
+    if(S.pri&&d.PRIORIDAD!==S.pri)return false;
+    if(S.srch){const t=(d.ACTIVIDAD+d.SUBACTIVIDAD+d.RESPONSABLE+d.RUBRO_NOMBRE).toLowerCase();if(!t.includes(S.srch.toLowerCase()))return false;}
     return true;
   });
 }
 
-/* ═══════════════════════════════════════════════════
-   CYCLE ACTIONS
-═══════════════════════════════════════════════════ */
-function cycleS(id){
-  const d=DATA.find(x=>x.ID===id); if(!d)return;
-  d.ESTADO=STATUS_ORDER[(STATUS_ORDER.indexOf(d.ESTADO)+1)%STATUS_ORDER.length];
-  render();
-}
-function cycleP(id){
-  const d=DATA.find(x=>x.ID===id); if(!d)return;
-  d.PRIORIDAD=PRIO_ORDER[(PRIO_ORDER.indexOf(d.PRIORIDAD)+1)%PRIO_ORDER.length];
-  render();
-}
+/* ═══════ ACTIONS ═══════ */
+function cycS(id){const d=DATA.find(x=>x.ID===id);if(!d)return;d.ESTADO=SORD[(SORD.indexOf(d.ESTADO)+1)%SORD.length];render()}
+function cycP(id){const d=DATA.find(x=>x.ID===id);if(!d)return;d.PRIORIDAD=PORD[(PORD.indexOf(d.PRIORIDAD)+1)%PORD.length];render()}
+function togP(p){S.colP[p]=!S.colP[p];render()}
+function togR(k){S.colR[k]=!S.colR[k];render()}
+function setP(v,btn){S.pilar=v;document.querySelectorAll('.tab').forEach(b=>b.className='tab');const m={all:'aall',J:'aj',T:'at',C:'acom',F:'afin'};btn.className='tab '+(m[v]||'aall');render()}
+function setSrch(v){S.srch=v;render()}
+function setEst(v){S.est=v;render()}
+function setPri(v){S.pri=v;render()}
+function setV(v){S.view=v;document.getElementById('btnL').classList.toggle('act',v==='l');document.getElementById('btnG').classList.toggle('act',v==='g');render()}
 
-/* ═══════════════════════════════════════════════════
-   TOGGLE COLLAPSE
-═══════════════════════════════════════════════════ */
-function togPillar(p){state.collPillar[p]=!state.collPillar[p];render()}
-function togRubro(k){state.collRubro[k]=!state.collRubro[k];render()}
-
-/* ═══════════════════════════════════════════════════
-   FILTER ACTIONS
-═══════════════════════════════════════════════════ */
-function setPilar(v,btn){
-  state.pilar=v;
-  document.querySelectorAll('.tab').forEach(b=>b.className='tab');
-  const cls={all:'act-all',Juridico:'act-j',Tecnico:'act-t',Financiero:'act-f'};
-  btn.className='tab '+(cls[v]||'act-all');
-  render();
-}
-function setSearch(v){state.search=v;render()}
-function setEstado(v){state.estado=v;render()}
-function setPrio(v){state.prio=v;render()}
-function setView(v){
-  state.view=v;
-  document.getElementById('btnLista').classList.toggle('active',v==='lista');
-  document.getElementById('btnGantt').classList.toggle('active',v==='gantt');
-  render();
-}
-
-/* ═══════════════════════════════════════════════════
-   MODAL
-═══════════════════════════════════════════════════ */
-function openModal(id){
-  const d=DATA.find(x=>x.ID===id); if(!d)return;
-  state.editId=id; state.isNew=false;
-  document.getElementById('mTitle').textContent=`Editar · ${d.ACT_ID}`;
+/* ═══════ MODAL ═══════ */
+function openM(id){
+  const d=DATA.find(x=>x.ID===id);if(!d)return;
+  S.editId=id;S.isNew=false;
+  document.getElementById('mtitle').textContent=`Editar · ${d.ACT_ID}`;
   document.getElementById('m-act').value=d.ACTIVIDAD;
   document.getElementById('m-sub').value=d.SUBACTIVIDAD;
   document.getElementById('m-resp').value=d.RESPONSABLE;
   document.getElementById('m-est').value=d.ESTADO;
   document.getElementById('m-ini').value=d.FECHA_INICIO;
   document.getElementById('m-fin').value=d.FECHA_FIN;
-  document.getElementById('m-prio').value=d.PRIORIDAD;
-  document.getElementById('mBtnDel').classList.remove('hidden');
-  document.getElementById('modalOv').classList.remove('hidden');
+  document.getElementById('m-pri').value=d.PRIORIDAD;
+  document.getElementById('mbdel').classList.remove('hidden');
+  document.getElementById('mov').classList.remove('hidden');
 }
-function openNewModal(pilar,rubro_id,rubro_num,rubro_nombre){
-  state.editId=null; state.isNew=true;
-  state._newPilar=pilar; state._newRubroId=rubro_id;
-  state._newRubroNum=rubro_num; state._newRubroNombre=rubro_nombre;
-  document.getElementById('mTitle').textContent='Nueva Actividad';
-  document.getElementById('m-act').value='';
-  document.getElementById('m-sub').value='';
+function openNew(p,r,rn,rnm){
+  S.isNew=true;S.editId=null;S._np=p;S._nr=r;S._rnum=rn;S._rnm=rnm;
+  document.getElementById('mtitle').textContent='Nueva Actividad';
+  ['m-act','m-sub'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('m-resp').value='SAF';
   document.getElementById('m-est').value='Pendiente';
   document.getElementById('m-ini').value='';
   document.getElementById('m-fin').value='';
-  document.getElementById('m-prio').value='Alta';
-  document.getElementById('mBtnDel').classList.add('hidden');
-  document.getElementById('modalOv').classList.remove('hidden');
+  document.getElementById('m-pri').value='Alta';
+  document.getElementById('mbdel').classList.add('hidden');
+  document.getElementById('mov').classList.remove('hidden');
 }
-function closeModal(){document.getElementById('modalOv').classList.add('hidden');state.editId=null}
-function saveModal(){
+function closeM(){document.getElementById('mov').classList.add('hidden');S.editId=null}
+function saveM(){
   const act=document.getElementById('m-act').value.trim();
-  if(!act){alert('El campo Actividad es obligatorio.');return}
-  if(state.isNew){
-    const newItem={
-      ID:++state.nextId,
-      PILAR:state._newPilar, RUBRO_ID:state._newRubroId,
-      RUBRO_NUM:state._newRubroNum, RUBRO_NOMBRE:state._newRubroNombre,
-      ACT_ID:`${state._newRubroId}-N${state.nextId}`,
-      ACTIVIDAD:act,
+  if(!act){alert('El campo Actividad es requerido.');return}
+  if(S.isNew){
+    DATA.push({ID:++S.nextId,PILAR:S._np,RUBRO_ID:S._nr,RUBRO_NUM:S._rnum,RUBRO_NOMBRE:S._rnm,
+      ACT_ID:`${S._nr}-N${S.nextId}`,ACTIVIDAD:act,
       SUBACTIVIDAD:document.getElementById('m-sub').value.trim(),
       RESPONSABLE:document.getElementById('m-resp').value,
       FECHA_INICIO:document.getElementById('m-ini').value,
       FECHA_FIN:document.getElementById('m-fin').value,
       ESTADO:document.getElementById('m-est').value,
-      PRIORIDAD:document.getElementById('m-prio').value,
-    };
-    DATA.push(newItem);
+      PRIORIDAD:document.getElementById('m-pri').value});
   } else {
-    const d=DATA.find(x=>x.ID===state.editId); if(!d)return;
-    d.ACTIVIDAD=act;
-    d.SUBACTIVIDAD=document.getElementById('m-sub').value.trim();
+    const d=DATA.find(x=>x.ID===S.editId);if(!d)return;
+    d.ACTIVIDAD=act;d.SUBACTIVIDAD=document.getElementById('m-sub').value.trim();
     d.RESPONSABLE=document.getElementById('m-resp').value;
     d.FECHA_INICIO=document.getElementById('m-ini').value;
     d.FECHA_FIN=document.getElementById('m-fin').value;
     d.ESTADO=document.getElementById('m-est').value;
-    d.PRIORIDAD=document.getElementById('m-prio').value;
+    d.PRIORIDAD=document.getElementById('m-pri').value;
   }
-  closeModal(); render();
+  closeM();render();
 }
-function deleteItem(){
-  if(!confirm('¿Eliminar esta actividad?'))return;
-  DATA=DATA.filter(x=>x.ID!==state.editId);
-  closeModal(); render();
-}
-document.getElementById('modalOv').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal()});
+function delItem(){if(!confirm('¿Eliminar esta actividad?'))return;DATA=DATA.filter(x=>x.ID!==S.editId);closeM();render()}
+document.getElementById('mov').addEventListener('click',e=>{if(e.target===e.currentTarget)closeM()});
 
-/* ═══════════════════════════════════════════════════
-   UPDATE HEADER STATS & PROGRESS
-═══════════════════════════════════════════════════ */
-function updateMeta(){
-  const total=DATA.length;
-  const proc=DATA.filter(d=>d.ESTADO==='En Proceso').length;
-  const comp=DATA.filter(d=>d.ESTADO==='Completado').length;
-  const pend=DATA.filter(d=>d.ESTADO==='Pendiente').length;
-  const blqd=DATA.filter(d=>d.ESTADO==='Bloqueado').length;
-  const pct=Math.round((comp+proc*0.5)/total*100);
+/* ═══════ META UPDATE ═══════ */
+function updMeta(){
+  const tot=DATA.length,proc=DATA.filter(d=>d.ESTADO==='En Proceso').length,
+        comp=DATA.filter(d=>d.ESTADO==='Completado').length,
+        pend=DATA.filter(d=>d.ESTADO==='Pendiente').length,
+        bloq=DATA.filter(d=>d.ESTADO==='Bloqueado').length;
+  const pct=Math.round((comp+proc*.5)/tot*100);
   document.getElementById('hdrStats').innerHTML=`
-    <div class="stat-chip"><strong>${total}</strong> actividades</div>
-    <div class="stat-chip"><strong style="color:#e06888">${proc}</strong> en proceso</div>
-    <div class="stat-chip"><strong style="color:#6dce8c">${comp}</strong> completadas</div>
-  `;
-  document.getElementById('progFill').style.width=pct+'%';
-  document.getElementById('progPct').textContent=pct+'%';
-  document.getElementById('tb-all').textContent=total;
+    <div class="schip"><strong>${tot}</strong> actividades</div>
+    <div class="schip"><strong style="color:#e06888">${proc}</strong> en proceso</div>
+    <div class="schip"><strong style="color:#62ca86">${comp}</strong> completadas</div>`;
+  document.getElementById('pf').style.width=pct+'%';
+  document.getElementById('pp').textContent=pct+'%';
+  document.getElementById('tb-all').textContent=tot;
   document.getElementById('tb-j').textContent=DATA.filter(d=>d.PILAR==='Base Jurídica').length;
   document.getElementById('tb-t').textContent=DATA.filter(d=>d.PILAR==='Base Técnica').length;
-  document.getElementById('tb-f').textContent=DATA.filter(d=>d.PILAR==='Base Comercial').length;
-  document.getElementById('progChips').innerHTML=`
-    <div class="prog-chip">🟡 Pendiente <b>${pend}</b></div>
-    <div class="prog-chip" style="color:#e06888">🔴 En Proceso <b>${proc}</b></div>
-    <div class="prog-chip" style="color:#6dce8c">✅ Completado <b>${comp}</b></div>
-    ${blqd?`<div class="prog-chip" style="color:#e08080">🚫 Bloqueado <b>${blqd}</b></div>`:''}
-  `;
+  document.getElementById('tb-c').textContent=DATA.filter(d=>d.PILAR==='Base Comercial').length;
+  document.getElementById('tb-f').textContent=DATA.filter(d=>d.PILAR==='Base Financiera').length;
+  document.getElementById('pch').innerHTML=`
+    <div class="pc">🟡 Pend. <b style="color:#d9b048">${pend}</b></div>
+    <div class="pc">🔴 Proceso <b style="color:#e06888">${proc}</b></div>
+    <div class="pc">✅ Comp. <b style="color:#62ca86">${comp}</b></div>
+    ${bloq?`<div class="pc">🚫 Bloq. <b style="color:#dc7878">${bloq}</b></div>`:''}`;
 }
 
-/* ═══════════════════════════════════════════════════
-   RENDER LISTA
-═══════════════════════════════════════════════════ */
-function renderLista(filtered){
-  const pillarOrder=['Base Jurídica','Base Técnica','Base Comercial'];
+/* ═══════ RENDER LISTA ═══════ */
+function rLista(filt){
+  const pord=['Base Jurídica','Base Técnica','Base Comercial','Base Financiera'];
   let h='';
-  for(const pilarName of pillarOrder){
-    const cfg=PILLARS[pilarName];
-    if(state.pilar!=='all' && cfg.key!==state.pilar) continue;
-    const items=filtered.filter(d=>d.PILAR===pilarName);
-    if(!items.length) continue;
-
-    const collapsed=state.collPillar[pilarName];
+  for(const pn of pord){
+    const cfg=PCFG[pn];
+    if(S.pilar!=='all'&&cfg.k!==S.pilar)continue;
+    const items=filt.filter(d=>d.PILAR===pn);
+    if(!items.length)continue;
+    const col=S.colP[pn];
     const rubros=[...new Map(items.map(d=>[d.RUBRO_ID,{id:d.RUBRO_ID,num:d.RUBRO_NUM,name:d.RUBRO_NOMBRE}])).values()];
-    const statsH=`
-      <span class="pillar-stat-chip">${items.length} activs.</span>
-      ${['Pendiente','En Proceso','Completado'].map(s=>{const n=items.filter(d=>d.ESTADO===s).length;return n?`<span class="pillar-stat-chip">${s}: ${n}</span>`:''}).join('')}
-    `;
-
-    h+=`<section class="pillar" style="--pc:${cfg.color}">
-      <div class="pillar-hdr" style="background:linear-gradient(135deg,${cfg.color}e8,${cfg.color}a0)" onclick="togPillar('${pilarName.replace(/'/g,"\\'")}')">
-        <div class="pillar-icon">${cfg.icon}</div>
-        <div class="pillar-info">
-          <div class="pillar-title">${esc(cfg.label)}</div>
-          <div class="pillar-sub">${esc(pilarName)} · ${items.length} actividades</div>
-        </div>
-        <div class="pillar-meta">${statsH}</div>
-        <span class="collapse-arr ${collapsed?'':'open'}">▼</span>
+    const sth=`<span class="psc">${items.length} act.</span>`+
+      ['Pendiente','En Proceso','Completado'].map(s=>{const n=items.filter(d=>d.ESTADO===s).length;return n?`<span class="psc">${s}: ${n}</span>`:''}).join('');
+    h+=`<section class="pillar">
+      <div class="phdr" style="background:linear-gradient(135deg,${cfg.c}e0,${cfg.c}90)" onclick="togP('${pn.replace(/'/g,"\\'")}')">
+        <div class="pico">${cfg.ico}</div>
+        <div class="pinfo"><div class="ptitle">${esc(cfg.lbl)}</div><div class="psub">${esc(pn)} · ${items.length} actividades</div></div>
+        <div class="pmeta">${sth}</div>
+        <span class="carr ${col?'':'open'}">▼</span>
       </div>`;
-
-    if(!collapsed){
-      for(const rubro of rubros){
-        const rk=pilarName+'_'+rubro.id;
-        const ritems=items.filter(d=>d.RUBRO_ID===rubro.id);
-        const rCollapsed=state.collRubro[rk];
-        h+=`<div class="rubro-grp">
-          <div class="rubro-hdr" onclick="togRubro('${rk.replace(/'/g,"\\'")}')">
-            <span class="rubro-num" style="color:${cfg.color}">${rubro.num}</span>
-            <span class="rubro-name">${esc(rubro.name)}</span>
-            <span class="rubro-cnt">${ritems.length} act.</span>
-            <span class="rubro-arr ${rCollapsed?'':'open'}">▶</span>
+    if(!col){
+      for(const rb of rubros){
+        const rk=pn+'_'+rb.id,ri=items.filter(d=>d.RUBRO_ID===rb.id),rc=S.colR[rk];
+        h+=`<div class="rgrp"><div class="rhdr" onclick="togR('${rk.replace(/'/g,"\\'")}')">
+          <span class="rnum" style="color:${cfg.c}">${rb.num}</span>
+          <span class="rname">${esc(rb.name)}</span>
+          <span class="rcnt">${ri.length} act.</span>
+          <span class="rarr ${rc?'':'open'}">▶</span>
+        </div>`;
+        if(!rc){
+          // Desktop table
+          h+=`<div class="tblw"><div class="chdr">
+            <div class="ch">ID</div><div class="ch">Clave</div>
+            <div class="ch">Actividad</div><div class="ch">Subactividad</div>
+            <div class="ch">Responsable</div><div class="ch">Inicio</div>
+            <div class="ch">Fin</div><div class="ch">Estado</div>
+            <div class="ch">Prior.</div><div class="ch"></div>
           </div>`;
-
-        if(!rCollapsed){
-          // DESKTOP TABLE
-          h+=`<div class="tbl-wrap">
-            <div class="col-hdr">
-              <div class="ch">ID</div><div class="ch">Clave</div>
-              <div class="ch">Actividad</div><div class="ch">Subactividad</div>
-              <div class="ch">Responsable</div><div class="ch">Inicio</div>
-              <div class="ch">Fin</div><div class="ch">Estado</div>
-              <div class="ch">Prior.</div><div class="ch"></div>
-            </div>`;
-          for(const it of ritems){
-            h+=`<div class="act-row" onclick="openModal(${it.ID})">
-              <div class="cell cell-id">${it.ID}</div>
-              <div class="cell cell-key" style="color:${cfg.color}">${esc(it.ACT_ID)}</div>
-              <div class="cell cell-act">${esc(it.ACTIVIDAD)}</div>
-              <div class="cell cell-sub">${esc(it.SUBACTIVIDAD)||'—'}</div>
-              <div class="cell cell-resp"><span>${esc(it.RESPONSABLE)}</span></div>
-              <div class="cell cell-date">${fmtD(it.FECHA_INICIO)}</div>
-              <div class="cell cell-date">${fmtD(it.FECHA_FIN)}</div>
-              <div class="cell">${sBadge(it.ESTADO,it.ID)}</div>
-              <div class="cell">${pBadge(it.PRIORIDAD,it.ID)}</div>
-              <div class="cell cell-edit"><button class="edit-btn" onclick="openModal(${it.ID});event.stopPropagation()" title="Editar">✎</button></div>
+          for(const it of ri){
+            h+=`<div class="arow" onclick="openM(${it.ID})">
+              <div class="cell cid">${it.ID}</div>
+              <div class="cell ckey" style="color:${cfg.c}">${esc(it.ACT_ID)}</div>
+              <div class="cell cact">${esc(it.ACTIVIDAD)}</div>
+              <div class="cell csub">${esc(it.SUBACTIVIDAD)||'—'}</div>
+              <div class="cell cresp"><span>${esc(it.RESPONSABLE)}</span></div>
+              <div class="cell cdate">${fd(it.FECHA_INICIO)}</div>
+              <div class="cell cdate">${fd(it.FECHA_FIN)}</div>
+              <div class="cell">${sbdg(it.ESTADO,it.ID)}</div>
+              <div class="cell">${pbdg(it.PRIORIDAD,it.ID)}</div>
+              <div class="cell cedit"><button class="ebtn" onclick="openM(${it.ID});event.stopPropagation()">✎</button></div>
             </div>`;
           }
           h+='</div>';
-
-          // MOBILE CARDS
-          h+='<div class="card-list">';
-          for(const it of ritems){
-            h+=`<div class="act-card" onclick="openModal(${it.ID})">
-              <div class="card-top">
-                <span class="card-key" style="background:${cfg.color}25;color:${cfg.color};border:1px solid ${cfg.color}40">${esc(it.ACT_ID)}</span>
-                <div class="card-title">${esc(it.ACTIVIDAD)}</div>
+          // Mobile cards
+          h+='<div class="clist">';
+          for(const it of ri){
+            h+=`<div class="acard" onclick="openM(${it.ID})">
+              <div class="ctop">
+                <span class="cck" style="background:${cfg.c}22;color:${cfg.c};border:1px solid ${cfg.c}40">${esc(it.ACT_ID)}</span>
+                <div class="cti">${esc(it.ACTIVIDAD)}</div>
               </div>
-              ${it.SUBACTIVIDAD?`<div class="card-sub">${esc(it.SUBACTIVIDAD)}</div>`:''}
-              <div class="card-row">
-                <span class="card-resp">${esc(it.RESPONSABLE)}</span>
-                ${it.FECHA_INICIO?`<span class="card-date"><svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>${fmtD(it.FECHA_INICIO)} → ${fmtD(it.FECHA_FIN)}</span>`:''}
-                ${sBadge(it.ESTADO,it.ID)}
-                ${pBadge(it.PRIORIDAD,it.ID)}
+              ${it.SUBACTIVIDAD?`<div class="csub2">${esc(it.SUBACTIVIDAD)}</div>`:''}
+              <div class="crow">
+                <span class="crsp">${esc(it.RESPONSABLE)}</span>
+                ${it.FECHA_INICIO?`<span class="cdt">📅 ${fd(it.FECHA_INICIO)}→${fd(it.FECHA_FIN)}</span>`:''}
+                ${sbdg(it.ESTADO,it.ID)}${pbdg(it.PRIORIDAD,it.ID)}
               </div>
             </div>`;
           }
           h+='</div>';
-
-          // SUMMARY + ADD
-          const pnd=ritems.filter(d=>d.ESTADO==='Pendiente').length;
-          const prc=ritems.filter(d=>d.ESTADO==='En Proceso').length;
-          const cmp=ritems.filter(d=>d.ESTADO==='Completado').length;
-          h+=`<div class="rubro-summary">
-            ${pnd?`<div class="sum-chip">🟡 Pendiente: <b>${pnd}</b></div>`:''}
-            ${prc?`<div class="sum-chip" style="color:#e06888">🔴 En Proceso: <b>${prc}</b></div>`:''}
-            ${cmp?`<div class="sum-chip" style="color:#6dce8c">✅ Completado: <b>${cmp}</b></div>`:''}
-            <button class="add-btn" onclick="openNewModal('${pilarName.replace(/'/g,"\\'")}','${rubro.id}',${rubro.num},'${rubro.name.replace(/'/g,"\\'")}');event.stopPropagation()">+ Agregar actividad</button>
+          // Summary
+          const pn2=ri.filter(d=>d.ESTADO==='Pendiente').length,
+                ep=ri.filter(d=>d.ESTADO==='En Proceso').length,
+                cp=ri.filter(d=>d.ESTADO==='Completado').length;
+          const rnSafe=rb.name.replace(/'/g,"\\'");
+          h+=`<div class="rsum">
+            ${pn2?`<div class="smc">🟡 Pend.: <b>${pn2}</b></div>`:''}
+            ${ep?`<div class="smc" style="color:#e06888">🔴 Proc.: <b>${ep}</b></div>`:''}
+            ${cp?`<div class="smc" style="color:#62ca86">✅ Comp.: <b>${cp}</b></div>`:''}
+            <button class="addbtn" onclick="openNew('${pn.replace(/'/g,"\\'")}','${rb.id}',${rb.num},'${rnSafe}');event.stopPropagation()">+ Agregar</button>
           </div>`;
         }
         h+='</div>';
@@ -434,63 +321,37 @@ function renderLista(filtered){
     }
     h+='</section>';
   }
-  if(!h) h=`<div class="empty-state"><div class="icon">🔍</div><div>Sin resultados para los filtros aplicados.</div></div>`;
-  return h;
+  return h||'<div class="empty"><div class="ei">🔍</div>Sin resultados para los filtros aplicados.</div>';
 }
 
-/* ═══════════════════════════════════════════════════
-   RENDER GANTT
-═══════════════════════════════════════════════════ */
-function renderGantt(filtered){
-  const MONTHS=[
-    {l:'Nov 25',s:'2025-11-01',e:'2025-11-30'},
-    {l:'Dic 25',s:'2025-12-01',e:'2025-12-31'},
-    {l:'Ene 26',s:'2026-01-01',e:'2026-01-31'},
-    {l:'Feb 26',s:'2026-02-01',e:'2026-02-28'},
-    {l:'Mar 26',s:'2026-03-01',e:'2026-03-31'},
-    {l:'Abr 26',s:'2026-04-01',e:'2026-04-30'},
-    {l:'May 26',s:'2026-05-01',e:'2026-05-31'},
-    {l:'Jun 26',s:'2026-06-01',e:'2026-06-30'},
-    {l:'Jul 26',s:'2026-07-01',e:'2026-07-31'},
-    {l:'Ago-Oct',s:'2026-08-01',e:'2026-10-31'},
-    {l:'Nov-Dic',s:'2026-11-01',e:'2026-12-31'},
+/* ═══════ RENDER GANTT ═══════ */
+function rGantt(filt){
+  const MOS=[
+    {l:'Nov 25',s:'2025-11-01'},{l:'Dic 25',s:'2025-12-01'},
+    {l:'Ene 26',s:'2026-01-01'},{l:'Feb 26',s:'2026-02-01'},
+    {l:'Mar 26',s:'2026-03-01'},{l:'Abr 26',s:'2026-04-01'},
+    {l:'May 26',s:'2026-05-01'},{l:'Jun 26',s:'2026-06-01'},
+    {l:'Jul 26',s:'2026-07-01'},{l:'Ago-Sep',s:'2026-08-01'},
+    {l:'Oct-Nov',s:'2026-10-01'},{l:'Dic 26',s:'2026-12-01'},
+    {l:'2027',  s:'2027-01-01'},
   ];
-  const rStart=new Date('2025-11-01'), rEnd=new Date('2026-12-31');
-  const rMs=rEnd-rStart;
-  const pct=d=>Math.max(0,Math.min(100,(new Date(d)-rStart)/rMs*100));
-  const monthsH=MONTHS.map(m=>`<div class="gantt-month-hdr">${m.l}</div>`).join('');
-
-  let h=`<div class="gantt-wrap"><div class="gantt-table">
-    <div class="gantt-thead">
-      <div class="gantt-lbl-hdr">Actividad</div>
-      <div class="gantt-months">${monthsH}</div>
-    </div>`;
-
-  const pillarOrder=['Base Jurídica','Base Técnica','Base Comercial'];
-  for(const pn of pillarOrder){
-    const cfg=PILLARS[pn];
-    if(state.pilar!=='all' && cfg.key!==state.pilar) continue;
-    const pitems=filtered.filter(d=>d.PILAR===pn&&d.FECHA_INICIO&&d.FECHA_FIN);
-    if(!pitems.length) continue;
-
-    h+=`<div class="gantt-pilar-row">
-      <div class="gantt-pilar-lbl" style="color:${cfg.color}">${cfg.icon} <span>${cfg.label}</span></div>
-      <div class="gantt-pilar-timeline"></div>
-    </div>`;
-
+  const rs=new Date('2025-11-01'),re=new Date('2027-01-31');
+  const pct=d=>Math.max(0,Math.min(100,(new Date(d)-rs)/(re-rs)*100));
+  const mhd=MOS.map(m=>`<div class="gmo">${m.l}</div>`).join('');
+  let h=`<div class="gantw"><div class="gtt">
+    <div class="ghead"><div class="glhdr">Actividad</div><div class="gmonths">${mhd}</div></div>`;
+  const pord=['Base Jurídica','Base Técnica','Base Comercial','Base Financiera'];
+  for(const pn of pord){
+    const cfg=PCFG[pn];
+    if(S.pilar!=='all'&&cfg.k!==S.pilar)continue;
+    const pitems=filt.filter(d=>d.PILAR===pn&&d.FECHA_INICIO&&d.FECHA_FIN);
+    if(!pitems.length)continue;
+    h+=`<div class="gprow"><div class="gplbl" style="color:${cfg.c}">${cfg.ico} ${cfg.lbl}</div><div class="gpline"></div></div>`;
     for(const it of pitems){
-      const left=pct(it.FECHA_INICIO);
-      const right=pct(it.FECHA_FIN);
-      const width=Math.max(right-left,0.4);
-      h+=`<div class="gantt-row" onclick="openModal(${it.ID})" title="${it.ACT_ID}: ${it.ACTIVIDAD}\n${fmtD(it.FECHA_INICIO)} → ${fmtD(it.FECHA_FIN)} · ${it.RESPONSABLE}">
-        <div class="gantt-row-lbl">
-          <span class="gantt-row-key" style="color:${cfg.color}">${esc(it.ACT_ID)}</span>
-          <span class="gantt-row-name">${esc(it.SUBACTIVIDAD||it.ACTIVIDAD)}</span>
-        </div>
-        <div class="gantt-bar-wrap">
-          <div class="gantt-bar" style="left:${left}%;width:${width}%;background:linear-gradient(90deg,${cfg.color},${cfg.color}88)"
-            title="${esc(it.ACT_ID)}: ${fmtD(it.FECHA_INICIO)} → ${fmtD(it.FECHA_FIN)}"></div>
-        </div>
+      const l=pct(it.FECHA_INICIO),r=pct(it.FECHA_FIN),w=Math.max(r-l,.3);
+      h+=`<div class="grow" onclick="openM(${it.ID})" title="${it.ACT_ID}: ${it.ACTIVIDAD}\n${fd(it.FECHA_INICIO)} → ${fd(it.FECHA_FIN)}\n${it.RESPONSABLE} · ${it.ESTADO}">
+        <div class="glbl"><span class="gkey" style="color:${cfg.c}">${esc(it.ACT_ID)}</span><span class="gnm">${esc(it.SUBACTIVIDAD||it.ACTIVIDAD)}</span></div>
+        <div class="gbw"><div class="gbar" style="left:${l}%;width:${w}%;background:linear-gradient(90deg,${cfg.c},${cfg.c}77)"></div></div>
       </div>`;
     }
   }
@@ -498,14 +359,11 @@ function renderGantt(filtered){
   return h;
 }
 
-/* ═══════════════════════════════════════════════════
-   MAIN RENDER
-═══════════════════════════════════════════════════ */
+/* ═══════ RENDER ═══════ */
 function render(){
-  const f=getFiltered();
-  const el=document.getElementById('mainView');
-  el.innerHTML=state.view==='lista'?renderLista(f):renderGantt(f);
-  updateMeta();
+  const f=getFilt();
+  document.getElementById('mainV').innerHTML=S.view==='l'?rLista(f):rGantt(f);
+  updMeta();
 }
 
 render();
