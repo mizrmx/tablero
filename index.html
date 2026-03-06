@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel Ejecutivo</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-badge">V</div>
+      <div>
+        <div class="logo-text">Villahermosa 2030</div>
+        <div class="logo-sub">Panel Ejecutivo de Proyecto</div>
+      </div>
+    </div>
+    <div class="header-controls">
+      <div class="view-toggle">
+        <button class="view-btn active" onclick="setView('list',this)">☰ Lista</button>
+        <button class="view-btn" onclick="setView('gantt',this)">📅 Cronograma</button>
+        <button class="view-btn" onclick="setView('board',this)">⊞ Tablero</button>
+      </div>
+      <button class="btn-add" onclick="openModal()">＋ Nueva Actividad</button>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- MESA SEGUIMIENTO -->
+  <div class="mesa-section">
+    <div>
+      <div class="mesa-label">📋 Mesa de Seguimiento</div>
+      <div class="mesa-title">Comité Ejecutivo Villahermosa 2030</div>
+    </div>
+    <div class="mesa-badges">
+      <div class="mesa-badge freq">🔄 Seguimiento Quincenal</div>
+      <div class="mesa-badge next">📅 Próxima: Abril 2025</div>
+      <div class="mesa-badge resp">👤 Coordinación General</div>
+    </div>
+  </div>
+
+  <!-- PROJECT KPIs -->
+  <div class="project-header">
+    <div class="project-title">Estructura Ejecutiva de Actividades</div>
+    <div class="project-desc">Tres Pilares Estratégicos · Jurídico · Técnico · Financiero</div>
+    <div class="kpi-row" id="kpiRow"></div>
+  </div>
+
+  <!-- PILLAR TABS -->
+  <div class="pillars-nav" id="pillarsNav">
+    <div class="pillar-tab all" onclick="filterPillar('all',this)">
+      <div class="pillar-dot" style="background:var(--gold)"></div> Todos los Pilares
+    </div>
+    <div class="pillar-tab" onclick="filterPillar('juridico',this)">
+      <div class="pillar-dot" style="background:var(--jurídico)"></div> 2. Base Jurídica
+    </div>
+    <div class="pillar-tab" onclick="filterPillar('tecnico',this)">
+      <div class="pillar-dot" style="background:var(--tecnico)"></div> 3. Base Técnica
+    </div>
+    <div class="pillar-tab" onclick="filterPillar('financiero',this)">
+      <div class="pillar-dot" style="background:var(--financiero)"></div> 4. Base Financiera
+    </div>
+  </div>
+
+  <!-- LIST VIEW -->
+  <div class="list-wrap" id="listView">
+    <div class="table-wrap">
+      <div class="table-toolbar">
+        <div class="search-box">
+          <span>🔍</span>
+          <input type="text" placeholder="Buscar actividad..." oninput="searchActs(this.value)" id="searchInput">
+        </div>
+        <div class="toolbar-right">
+          <div class="filter-chip active" onclick="toggleFilter('all',this)">Todo</div>
+          <div class="filter-chip" onclick="toggleFilter('pendiente',this)">Pendiente</div>
+          <div class="filter-chip" onclick="toggleFilter('proceso',this)">En Proceso</div>
+          <div class="filter-chip" onclick="toggleFilter('completado',this)">Completado</div>
+        </div>
+      </div>
+      <div>
+        <div class="col-group table-head">
+          <div class="th"></div>
+          <div class="th">📌 Actividad / Subactividad</div>
+          <div class="th">👤 Responsable</div>
+          <div class="th">📅 Fechas</div>
+          <div class="th">Estado</div>
+          <div class="th">Prioridad</div>
+          <div class="th">Avance</div>
+          <div class="th">Acciones</div>
+        </div>
+        <div id="tableBody"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GANTT VIEW -->
+  <div class="gantt-wrap table-wrap" id="ganttView">
+    <div class="gantt-container">
+      <table class="gantt-table" id="ganttTable"></table>
+    </div>
+  </div>
+
+  <!-- BOARD VIEW -->
+  <div class="board-wrap" id="boardView">
+    <div class="board-col" id="board-pendiente">
+      <div class="board-col-title"><span>⏸ Pendiente</span> <span class="nova" id="cnt-pendiente"></span></div>
+      <div id="cards-pendiente"></div>
+    </div>
+    <div class="board-col" id="board-proceso">
+      <div class="board-col-title"><span>⚡ En Proceso</span> <span class="nova" id="cnt-proceso"></span></div>
+      <div id="cards-proceso"></div>
+    </div>
+    <div class="board-col" id="board-revision">
+      <div class="board-col-title"><span>🔍 Revisión</span> <span class="nova" id="cnt-revision"></span></div>
+      <div id="cards-revision"></div>
+    </div>
+    <div class="board-col" id="board-completado">
+      <div class="board-col-title"><span>✅ Completado</span> <span class="nova" id="cnt-completado"></span></div>
+      <div id="cards-completado"></div>
+    </div>
+    <div class="board-col" id="board-bloqueado">
+      <div class="board-col-title"><span>🔴 Bloqueado</span> <span class="nova" id="cnt-bloqueado"></span></div>
+      <div id="cards-bloqueado"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL NUEVA ACTIVIDAD / EDIT -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">Nueva Actividad</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-field">
+      <div class="modal-label">Nombre de la Actividad</div>
+      <input class="modal-input" id="mName" placeholder="Ej. Integración documental..." />
+    </div>
+    <div class="modal-row">
+      <div class="modal-field">
+        <div class="modal-label">Pilar Estratégico</div>
+        <select class="modal-select" id="mPilar">
+          <option value="juridico">2. Base Jurídica</option>
+          <option value="tecnico">3. Base Técnica</option>
+          <option value="financiero">4. Base Financiera</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <div class="modal-label">Estado</div>
+        <select class="modal-select" id="mStatus">
+          <option value="pendiente">Pendiente</option>
+          <option value="proceso">En Proceso</option>
+          <option value="revision">Revisión</option>
+          <option value="completado">Completado</option>
+          <option value="bloqueado">Bloqueado</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-row">
+      <div class="modal-field">
+        <div class="modal-label">Fecha Inicio</div>
+        <input type="date" class="modal-input" id="mStart" />
+      </div>
+      <div class="modal-field">
+        <div class="modal-label">Fecha Fin</div>
+        <input type="date" class="modal-input" id="mEnd" />
+      </div>
+    </div>
+    <div class="modal-row">
+      <div class="modal-field">
+        <div class="modal-label">Responsable</div>
+        <input class="modal-input" id="mResp" placeholder="Área o persona..." />
+      </div>
+      <div class="modal-field">
+        <div class="modal-label">Prioridad</div>
+        <select class="modal-select" id="mPriority">
+          <option value="alta">Alta</option>
+          <option value="media">Media</option>
+          <option value="baja">Baja</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-field">
+      <div class="modal-label">Avance (%)</div>
+      <input type="range" class="modal-input" id="mProgress" min="0" max="100" value="0" oninput="document.getElementById('mProgressVal').textContent=this.value+'%'" style="padding:4px 0; cursor:pointer;" />
+      <span id="mProgressVal" style="font-size:12px;color:#991547;">0%</span>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="btn-save" onclick="saveModal()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== DATA =====
+const STATUSES = {
+  pendiente: {label:'Pendiente', cls:'s-pendiente'},
+  proceso: {label:'En Proceso', cls:'s-proceso'},
+  revision: {label:'Revisión', cls:'s-revision'},
+  completado: {label:'Completado', cls:'s-completado'},
+  bloqueado: {label:'Bloqueado', cls:'s-bloqueado'}
+};
+const PRIORITIES = { alta:{label:'Alta',cls:'p-alta'}, media:{label:'Media',cls:'p-media'}, baja:{label:'Baja',cls:'p-baja'} };
+const PILLAR_COLORS = { juridico:'var(--jurídico)', tecnico:'var(--tecnico)', financiero:'var(--financiero)' };
+
+let editingId = null;
+let currentFilter = 'all';
+let statusFilter = 'all';
+
+const data = {
+  pillars: [
+    {
+      id:'juridico', name:'Base Jurídica', icon:'⚖️',
+      desc:'Regularización y preparación de los bienes inmobiliarios',
+      color:'var(--jurídico)', dimColor:'var(--juridico-dim)', textColor:'#e06080',
+      progress: 15,
+      rubros: [
+        {
+          id:'j1', num:'2.1', name:'Integración del Expediente Jurídico de los Terrenos',
+          product:'Expediente jurídico consolidado por predio.',
+          actividades: [
+            { id:'j1a1', name:'Integración documental de títulos de propiedad', resp:'Dirección Jurídica', start:'Ene 2025', end:'Feb 2025', status:'proceso', priority:'alta', progress:40 },
+            { id:'j1a2', name:'Validación registral ante Registro Público de la Propiedad', resp:'Dirección Jurídica', start:'Feb 2025', end:'Mar 2025', status:'pendiente', priority:'alta', progress:0 },
+            { id:'j1a3', name:'Verificación de situación catastral', resp:'Catastro Municipal', start:'Feb 2025', end:'Mar 2025', status:'pendiente', priority:'media', progress:0 },
+            { id:'j1a4', name:'Identificación de restricciones legales o gravámenes', resp:'Dirección Jurídica', start:'Mar 2025', end:'Abr 2025', status:'pendiente', priority:'media', progress:0 }
+          ]
+        },
+        {
+          id:'j2', num:'2.2', name:'Proceso de Desafectación',
+          product:'Acuerdo de desafectación del bien del dominio público.',
+          actividades: [
+            { id:'j2a1', name:'Identificación del régimen actual del bien', resp:'Dirección Jurídica', start:'Mar 2025', end:'Abr 2025', status:'pendiente', priority:'alta', progress:0 },
+            { id:'j2a2', name:'Elaboración de dictamen jurídico de desafectación', resp:'Asesoría Jurídica', start:'Abr 2025', end:'May 2025', status:'pendiente', priority:'alta', progress:0 },
+            { id:'j2a3', name:'Autorización administrativa correspondiente', resp:'Secretaría General', start:'May 2025', end:'Jun 2025', status:'pendiente', priority:'alta', progress:0 }
+          ]
+        },
+        {
+          id:'j3', num:'2.3', name:'Proceso de Desincorporación',
+          product:'Decreto o acuerdo de desincorporación del patrimonio estatal.',
+          actividades: [
+            { id:'j3a1', name:'Elaboración del expediente técnico-jurídico', resp:'Dirección Jurídica', start:'May 2025', end:'Jun 2025', status:'pendiente', priority:'alta', progress:0 },
+            { id:'j3a2', name:'Integración de avalúo oficial', resp:'Valuador Certificado', start:'Jun 2025', end:'Jul 2025', status:'pendiente', priority:'media', progress:0 },
+            { id:'j3a3', name:'Autorización del Congreso del Estado (en su caso)', resp:'Congreso del Estado', start:'Jul 2025', end:'Ago 2025', status:'pendiente', priority:'alta', progress:0 },
+            { id:'j3a4', name:'Publicación en el Periódico Oficial', resp:'Secretaría General', start:'Ago 2025', end:'Sep 2025', status:'pendiente', priority:'media', progress:0 }
+          ]
+        },
+        {
+          id:'j4', num:'2.4', name:'Enajenación del Bien',
+          product:'Contratos de compraventa y captación de recursos.',
+          actividades: [
+            { id:'j4a1', name:'Diseño del mecanismo de comercialización', resp:'Dir. Comercialización', start:'Sep 2025', end:'Oct 2025', status:'pendiente', priority:'alta', progress:0 },
+            { id:'j4a2', name:'Elaboración de bases de licitación pública', resp:'Dirección Jurídica', start:'Oct 2025', end:'Nov 2025', status:'pendiente', priority:'alta', progress:0 },
+            { id:'j4a3', name:'Convocatoria', resp:'Comunicación Social', start:'Nov 2025', end:'Nov 2025', status:'pendiente', priority:'media', progress:0 },
+            { id:'j4a4', name:'Proceso de adjudicación', resp:'Comité de Licitación', start:'Dic 2025', end:'Ene 2026', status:'pendiente', priority:'alta', progress:0 },
+            { id:'j4a5', name:'Formalización de contratos', resp:'Dirección Jurídica', start:'Ene 2026', end:'Feb 2026', status:'pendiente', priority:'alta', progress:0 }
+          ]
+        }
+      ]
+    },
+    {
+      id:'tecnico', name:'Base Técnica', icon:'🏗️',
+      desc:'Planeación urbana y desarrollo del proyecto',
+      color:'var(--tecnico)', dimColor:'var(--tecnico-dim)', textColor:'#DDC9A3',
+      progress: 25,
+      rubros: [
+        {
+          id:'t1', num:'3.1', name:'Actualización del Programa de Desarrollo Urbano',
+          note:'Fecha objetivo: Septiembre 2025',
+          product:'Programa de Desarrollo Urbano actualizado.',
+          actividades: [
+            { id:'t1a1', name:'Diagnóstico urbano', resp:'Dir. Desarrollo Urbano', start:'Ene 2025', end:'Mar 2025', status:'proceso', priority:'alta', progress:50,
+              subs:[
+                {id:'t1a1s1', name:'Análisis de crecimiento urbano'},
+                {id:'t1a1s2', name:'Infraestructura existente'},
+                {id:'t1a1s3', name:'Movilidad y conectividad'},
+                {id:'t1a1s4', name:'Análisis ambiental y social'}
+              ]
+            },
+            { id:'t1a2', name:'Visión y ejes estratégicos', resp:'Dir. Desarrollo Urbano', start:'Mar 2025', end:'May 2025', status:'pendiente', priority:'alta', progress:0,
+              subs:[
+                {id:'t1a2s1', name:'Modelo de ciudad'},
+                {id:'t1a2s2', name:'Desarrollo económico'},
+                {id:'t1a2s3', name:'Movilidad'},
+                {id:'t1a2s4', name:'Sostenibilidad'}
+              ]
+            },
+            { id:'t1a3', name:'Zonificación y usos de suelo', resp:'Dir. Desarrollo Urbano', start:'May 2025', end:'Jul 2025', status:'pendiente', priority:'alta', progress:0,
+              subs:[
+                {id:'t1a3s1', name:'Determinación de polígonos de desarrollo'},
+                {id:'t1a3s2', name:'Asignación de usos de suelo'},
+                {id:'t1a3s3', name:'Densidades urbanas'}
+              ]
+            },
+            { id:'t1a4', name:'Vocación de los terrenos', resp:'Consultoría Urbana', start:'Jun 2025', end:'Jul 2025', status:'pendiente', priority:'media', progress:0,
+              subs:[
+                {id:'t1a4s1', name:'Comercial'},
+                {id:'t1a4s2', name:'Residencial'},
+                {id:'t1a4s3', name:'Servicios'},
+                {id:'t1a4s4', name:'Mixto'}
+              ]
+            },
+            { id:'t1a5', name:'Cartografía y políticas urbanas', resp:'Área SIG', start:'Jul 2025', end:'Sep 2025', status:'pendiente', priority:'media', progress:0,
+              subs:[
+                {id:'t1a5s1', name:'Elaboración de mapas urbanos'},
+                {id:'t1a5s2', name:'Normatividad urbanística aplicable'}
+              ]
+            }
+          ]
+        },
+        {
+          id:'t2', num:'3.2', name:'Levantamiento Topográfico',
+          product:'Planos técnicos oficiales.',
+          actividades: [
+            { id:'t2a1', name:'Medición georreferenciada de los predios', resp:'Topógrafo Certificado', start:'Feb 2025', end:'Mar 2025', status:'completado', priority:'alta', progress:100 },
+            { id:'t2a2', name:'Definición de poligonales', resp:'Topógrafo Certificado', start:'Mar 2025', end:'Abr 2025', status:'revision', priority:'alta', progress:80 },
+            { id:'t2a3', name:'Generación de planos topográficos', resp:'Dir. Técnica', start:'Abr 2025', end:'May 2025', status:'pendiente', priority:'media', progress:0 }
+          ]
+        },
+        {
+          id:'t3', num:'3.3', name:'Proyecto Ejecutivo "Villahermosa 2030"',
+          note:'⚡ Puede desarrollarse paralelo al inicio de obra.',
+          product:'Proyecto ejecutivo integral.',
+          actividades: [
+            { id:'t3a1', name:'Diseño arquitectónico', resp:'Despacho Arquitectónico', start:'Jun 2025', end:'Sep 2025', status:'pendiente', priority:'alta', progress:0 },
+            { id:'t3a2', name:'Ingeniería urbana', resp:'Consultoría Ingeniería', start:'Jul 2025', end:'Oct 2025', status:'pendiente', priority:'alta', progress:0 },
+            { id:'t3a3', name:'Infraestructura vial', resp:'SCT Tabasco', start:'Aug 2025', end:'Nov 2025', status:'pendiente', priority:'alta', progress:0 },
+            { id:'t3a4', name:'Infraestructura hidráulica y eléctrica', resp:'CFE / CAASIM', start:'Aug 2025', end:'Nov 2025', status:'pendiente', priority:'alta', progress:0 },
+            { id:'t3a5', name:'Espacios públicos', resp:'Dir. Desarrollo Urbano', start:'Sep 2025', end:'Nov 2025', status:'pendiente', priority:'media', progress:0 },
+            { id:'t3a6', name:'Imagen urbana', resp:'Despacho Arquitectónico', start:'Oct 2025', end:'Dic 2025', status:'pendiente', priority:'media', progress:0 }
+          ]
+        },
+        {
+          id:'t4', num:'3.4', name:'Portafolio para Comercialización de Predios',
+          product:'Catálogo de inversión inmobiliaria "Villahermosa 2030".',
+          actividades: [
+            { id:'t4a1', name:'Ficha técnica de cada terreno', resp:'Dir. Técnica', start:'Sep 2025', end:'Oct 2025', status:'pendiente', priority:'alta', progress:0,
+              subs:[
+                {id:'t4a1s1', name:'Superficie (m²)'},
+                {id:'t4a1s2', name:'Colindancias'},
+                {id:'t4a1s3', name:'COS'},
+                {id:'t4a1s4', name:'CUS'}
+              ]
+            },
+            { id:'t4a2', name:'Definición de vocación', resp:'Consultoría Urbana', start:'Oct 2025', end:'Oct 2025', status:'pendiente', priority:'media', progress:0,
+              subs:[
+                {id:'t4a2s1', name:'Comercial'},
+                {id:'t4a2s2', name:'Residencial'},
+                {id:'t4a2s3', name:'Uso mixto'},
+                {id:'t4a2s4', name:'Servicios'}
+              ]
+            },
+            { id:'t4a3', name:'Factibilidad de servicios', resp:'CFE / CAASIM', start:'Oct 2025', end:'Nov 2025', status:'pendiente', priority:'alta', progress:0,
+              subs:[
+                {id:'t4a3s1', name:'Agua'},
+                {id:'t4a3s2', name:'Energía eléctrica'},
+                {id:'t4a3s3', name:'Drenaje'},
+                {id:'t4a3s4', name:'Vialidades'}
+              ]
+            },
+            { id:'t4a4', name:'Reglamentación urbana', resp:'Dir. Desarrollo Urbano', start:'Nov 2025', end:'Dic 2025', status:'pendiente', priority:'media', progress:0,
+              subs:[
+                {id:'t4a4s1', name:'Tipologías de construcción'},
+                {id:'t4a4s2', name:'Lineamientos de diseño urbano'},
+                {id:'t4a4s3', name:'Imagen arquitectónica'}
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      id:'financiero', name:'Base Financiera', icon:'💰',
+      desc:'Estructuración económica del proyecto',
+      color:'var(--financiero)', dimColor:'var(--financiero-dim)', textColor:'#cc7090',
+      progress: 10,
+      rubros: [
+        {
+          id:'f1', num:'4.1', name:'Valuación de Activos Inmobiliarios',
+          product:'Valuación de activos completada.',
+          actividades: [
+            { id:'f1a1', name:'Avalúos comerciales', resp:'Valuador Certificado', start:'Mar 2025', end:'May 2025', status:'proceso', priority:'alta', progress:30 },
+            { id:'f1a2', name:'Análisis de valor por metro cuadrado', resp:'Dir. Financiera', start:'May 2025', end:'Jun 2025', status:'pendiente', priority:'alta', progress:0 },
+            { id:'f1a3', name:'Identificación de plusvalía proyectada', resp:'Consultoría Financiera', start:'Jun 2025', end:'Jul 2025', status:'pendiente', priority:'alta', progress:0 }
+          ]
+        },
+        {
+          id:'f2', num:'4.2', name:'Estrategia de Comercialización',
+          product:'Estrategia de comercialización definida.',
+          actividades: [
+            { id:'f2a1', name:'Definición de precios base', resp:'Dir. Comercialización', start:'Jul 2025', end:'Aug 2025', status:'pendiente', priority:'alta', progress:0 },
+            { id:'f2a2', name:'Diseño del esquema de venta', resp:'Dir. Comercialización', start:'Aug 2025', end:'Sep 2025', status:'pendiente', priority:'alta', progress:0 },
+            { id:'f2a3', name:'Segmentación de inversionistas', resp:'Consultoría Financiera', start:'Sep 2025', end:'Oct 2025', status:'pendiente', priority:'media', progress:0 },
+            { id:'f2a4', name:'Promoción nacional e internacional', resp:'Comunicación Social', start:'Oct 2025', end:'Dic 2025', status:'pendiente', priority:'alta', progress:0 }
+          ]
+        },
+        {
+          id:'f3', num:'4.3', name:'Modelo Financiero del Proyecto',
+          product:'Modelo financiero aprobado.',
+          actividades: [
+            { id:'f3a1', name:'Proyección de ingresos por venta de terrenos', resp:'Dir. Financiera', start:'Jun 2025', end:'Aug 2025', status:'pendiente', priority:'alta', progress:0 },
+            { id:'f3a2', name:'Flujo de caja del proyecto', resp:'Dir. Financiera', start:'Aug 2025', end:'Sep 2025', status:'pendiente', priority:'alta', progress:0 },
+            { id:'f3a3', name:'Calendario de ingresos', resp:'Dir. Financiera', start:'Sep 2025', end:'Oct 2025', status:'pendiente', priority:'media', progress:0 },
+            { id:'f3a4', name:'Asignación de recursos para infraestructura', resp:'Secretaría Finanzas', start:'Oct 2025', end:'Nov 2025', status:'pendiente', priority:'alta', progress:0 }
+          ]
+        },
+        {
+          id:'f4', num:'4.4', name:'Administración de los Recursos',
+          product:'Sistema de administración de recursos operativo.',
+          actividades: [
+            { id:'f4a1', name:'Recepción de ingresos', resp:'Tesorería', start:'Ene 2026', end:'Dic 2026', status:'pendiente', priority:'alta', progress:0 },
+            { id:'f4a2', name:'Integración presupuestal', resp:'Dir. Financiera', start:'Nov 2025', end:'Dic 2025', status:'pendiente', priority:'alta', progress:0 },
+            { id:'f4a3', name:'Aplicación de recursos al proyecto', resp:'Secretaría Finanzas', start:'Ene 2026', end:'Dic 2026', status:'pendiente', priority:'alta', progress:0 }
+          ]
+        }
+      ]
+    }
+  ]
+};
+
+// State
+const state = {
+  openPillars: { juridico: true, tecnico: true, financiero: true },
+  openRubros: {},
+  openActs: {},
+  pillarFilter: 'all',
+  statusFilter: 'all',
+  customActivities: []
+};
+
+// ===== RENDER FUNCTIONS =====
+function getAvatarColor(name) {
+  const colors = ['#4C7EC9','#4CB87E','#C96B4C','#9B59B6','#E67E22'];
+  let h = 0; for (let c of name) h = (h*31+c.charCodeAt(0)) % colors.length;
+  return colors[h];
+}
+function getInitials(name) { return name.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase(); }
+
+function renderStatus(st, id, field) {
+  const s = STATUSES[st] || STATUSES.pendiente;
+  const opts = Object.entries(STATUSES).map(([k,v])=>`<option value="${k}" ${k===st?'selected':''}>${v.label}</option>`).join('');
+  return `<select class="status-badge ${s.cls}" style="border:none;background:none;cursor:pointer;font-weight:600;font-size:11px;padding:3px 10px;border-radius:20px;" onchange="updateField('${id}','${field}',this.value)">${opts}</select>`;
+}
+function renderPriority(p) {
+  const pr = PRIORITIES[p] || PRIORITIES.media;
+  return `<span class="priority-badge ${pr.cls}">${pr.label}</span>`;
+}
+function renderProgress(pct, id) {
+  const color = pct>=80?'var(--tecnico)':pct>=40?'var(--gold)':'var(--financiero)';
+  return `<div style="display:flex;align-items:center;gap:6px;">
+    <div style="width:48px;height:5px;background:rgba(255,255,255,0.1);border-radius:3px;overflow:hidden;">
+      <div style="width:${pct}%;height:100%;background:${color};border-radius:3px;transition:width 0.4s;"></div>
+    </div>
+    <span style="font-size:11px;font-family:'DM Mono',monospace;color:var(--silver);">${pct}%</span>
+  </div>`;
+}
+function renderResp(resp) {
+  const col = getAvatarColor(resp);
+  const ini = getInitials(resp);
+  return `<div class="responsible-chip">
+    <div class="avatar" style="background:${col}20;color:${col};">${ini}</div>
+    <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100px;">${resp}</span>
+  </div>`;
+}
+
+function renderTableBody() {
+  const body = document.getElementById('tableBody');
+  let html = '';
+  for (const pillar of data.pillars) {
+    if (state.pillarFilter !== 'all' && state.pillarFilter !== pillar.id) continue;
+    const isOpen = state.openPillars[pillar.id];
+    const allActs = pillar.rubros.flatMap(r=>r.actividades);
+    const totalActs = allActs.length;
+    const doneActs = allActs.filter(a=>a.status==='completado').length;
+    html += `<div class="pillar-section" id="pillar-${pillar.id}">
+      <div class="pillar-header" onclick="togglePillar('${pillar.id}')" style="background:${pillar.dimColor};">
+        <span class="pillar-chevron ${isOpen?'open':''}" id="pchev-${pillar.id}">▶</span>
+        <span style="font-size:20px;">${pillar.icon}</span>
+        <span class="pillar-name" style="color:${pillar.textColor}">${pillar.name}</span>
+        <span class="pillar-badge" style="background:${pillar.dimColor};color:${pillar.textColor};border:1px solid ${pillar.color}40;">${pillar.desc}</span>
+        <div class="pillar-progress">
+          <div class="progress-bar-wrap">
+            <div class="progress-bar-fill" style="width:${pillar.progress}%;background:${pillar.color};"></div>
+          </div>
+          <span class="progress-pct">${pillar.progress}%</span>
+          <span style="font-size:11px;color:var(--silver);">${doneActs}/${totalActs} act.</span>
+        </div>
+      </div>`;
+    if (isOpen) {
+      for (const rubro of pillar.rubros) {
+        const rubroOpen = state.openRubros[rubro.id] !== false;
+        const actCount = rubro.actividades.length;
+        html += `<div class="rubro-section">
+          <div class="rubro-row" onclick="toggleRubro('${rubro.id}')">
+            <div class="rubro-cell rubro-expand ${rubroOpen?'open':''}">▶</div>
+            <div class="rubro-cell">
+              <span class="rubro-number" style="color:${pillar.textColor}">${rubro.num}</span>
+              <span class="rubro-title">${rubro.name}</span>
+              ${rubro.note ? `<span style="font-size:11px;color:var(--gold);margin-left:8px;">⚡ ${rubro.note}</span>` : ''}
+            </div>
+            <div class="rubro-cell"><span style="font-size:11px;color:var(--silver);">${actCount} actividades</span></div>
+            <div class="rubro-cell"></div>
+            <div class="rubro-cell"></div>
+            <div class="rubro-cell"></div>
+            <div class="rubro-cell"></div>
+            <div class="rubro-cell"><button class="inline-btn" onclick="event.stopPropagation();openModalFor('${pillar.id}','${rubro.id}')" title="Agregar actividad">＋</button></div>
+          </div>`;
+        if (rubroOpen) {
+          html += `<div>`;
+          for (const act of rubro.actividades) {
+            if (state.statusFilter !== 'all' && act.status !== state.statusFilter) continue;
+            const actOpen = state.openActs[act.id];
+            const hasSubs = act.subs && act.subs.length > 0;
+            html += `<div class="actividades-wrap">
+              <div class="actividad-row" onclick="${hasSubs?`toggleAct('${act.id}')`:''}" id="act-${act.id}">
+                <div class="actividad-cell act-expand ${hasSubs?(actOpen?'open':''):''}" style="${hasSubs?'':'opacity:0.3'}">
+                  ${hasSubs?'▶':'·'}
+                </div>
+                <div class="actividad-cell actividad-indent">
+                  <div class="act-dot" style="background:${pillar.color};"></div>
+                  <span class="editable" contenteditable="true" onblur="updateFieldDirect('${act.id}','name',this.textContent)" onclick="event.stopPropagation()">${act.name}</span>
+                </div>
+                <div class="actividad-cell">${renderResp(act.resp)}</div>
+                <div class="actividad-cell">
+                  <div class="date-range">
+                    <div class="date-start">Inicio: <span class="editable" contenteditable="true" onblur="updateFieldDirect('${act.id}','start',this.textContent)" onclick="event.stopPropagation()">${act.start}</span></div>
+                    <div class="date-end">Fin: <span class="editable" contenteditable="true" onblur="updateFieldDirect('${act.id}','end',this.textContent)" onclick="event.stopPropagation()">${act.end}</span></div>
+                  </div>
+                </div>
+                <div class="actividad-cell">${renderStatus(act.status, act.id, 'status')}</div>
+                <div class="actividad-cell">${renderPriority(act.priority)}</div>
+                <div class="actividad-cell">${renderProgress(act.progress, act.id)}</div>
+                <div class="actividad-cell">
+                  <button class="inline-btn" onclick="event.stopPropagation();openEditModal('${act.id}')" title="Editar">✏️</button>
+                </div>
+              </div>`;
+            if (hasSubs && actOpen) {
+              html += `<div class="subactividades-wrap">`;
+              for (const sub of act.subs) {
+                html += `<div class="subact-row">
+                  <div class="subact-cell"></div>
+                  <div class="subact-cell subact-indent">
+                    <div class="subact-bullet" style="background:${pillar.color}80;"></div>
+                    <span class="editable" contenteditable="true" onblur="updateSubName('${act.id}','${sub.id}',this.textContent)">${sub.name}</span>
+                  </div>
+                  <div class="subact-cell" colspan="6"></div>
+                  <div class="subact-cell"></div>
+                  <div class="subact-cell"></div>
+                  <div class="subact-cell"></div>
+                  <div class="subact-cell"></div>
+                </div>`;
+              }
+              html += `</div>`;
+            }
+            html += `</div>`;
+          }
+          // Product row
+          if (rubro.product) {
+            html += `<div class="product-row">
+              <span class="product-label">📦 Producto Entregable:</span>
+              <span class="product-text">${rubro.product}</span>
+            </div>`;
+          }
+          html += `</div>`;
+        }
+        html += `</div>`;
+      }
+    }
+    html += `</div>`;
+  }
+  body.innerHTML = html;
+}
+
+function renderKPIs() {
+  const allActs = data.pillars.flatMap(p=>p.rubros.flatMap(r=>r.actividades));
+  const total = allActs.length;
+  const done = allActs.filter(a=>a.status==='completado').length;
+  const inProg = allActs.filter(a=>a.status==='proceso').length;
+  const totalSubs = data.pillars.flatMap(p=>p.rubros.flatMap(r=>r.actividades.flatMap(a=>a.subs||[]))).length;
+  const overallPct = Math.round(allActs.reduce((s,a)=>s+a.progress,0)/total);
+  document.getElementById('kpiRow').innerHTML = `
+    <div class="kpi"><div class="kpi-label">Actividades</div><div class="kpi-value">${total}</div><div class="kpi-sub">Total del proyecto</div></div>
+    <div class="kpi"><div class="kpi-label">Completadas</div><div class="kpi-value" style="color:var(--tecnico);">${done}</div><div class="kpi-sub">Finalizadas</div></div>
+    <div class="kpi"><div class="kpi-label">En Proceso</div><div class="kpi-value" style="color:var(--gold-light);">${inProg}</div><div class="kpi-sub">Activas ahora</div></div>
+    <div class="kpi"><div class="kpi-label">Subactividades</div><div class="kpi-value">${totalSubs}</div><div class="kpi-sub">Desglose total</div></div>
+    <div class="kpi"><div class="kpi-label">Avance Global</div><div class="kpi-value" style="color:var(--gold-light);">${overallPct}%</div><div class="kpi-sub">Progreso acumulado</div></div>
+  `;
+}
+
+// Gantt
+const MONTHS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic','Ene 26','Feb 26','Mar 26'];
+function monthToIdx(m) {
+  const map = {'Ene':0,'Feb':1,'Mar':2,'Abr':3,'May':4,'Jun':5,'Jul':6,'Ago':7,'Sep':8,'Oct':9,'Nov':10,'Dic':11,'Ene 26':12,'Feb 26':13,'Mar 26':14};
+  for (const k of Object.keys(map)) if (m.startsWith(k)) return map[k];
+  return 0;
+}
+function renderGantt() {
+  let html = `<tr><th class="gantt-th gantt-task-col">Actividad</th>`;
+  MONTHS.forEach(m => { html += `<th class="gantt-th gantt-month-col">${m}</th>`; });
+  html += '</tr>';
+  for (const pillar of data.pillars) {
+    if (state.pillarFilter !== 'all' && state.pillarFilter !== pillar.id) continue;
+    html += `<tr class="gantt-section-row"><td class="gantt-td" colspan="${MONTHS.length+1}">
+      <span class="gantt-section-label" style="color:${pillar.textColor}">${pillar.icon} ${pillar.name}</span>
+    </td></tr>`;
+    for (const rubro of pillar.rubros) {
+      html += `<tr class="gantt-section-row"><td class="gantt-td" style="padding-left:20px;font-size:12px;color:var(--silver);" colspan="${MONTHS.length+1}">
+        <span style="color:${pillar.textColor};font-family:'DM Mono',monospace;font-size:11px;">${rubro.num}</span> ${rubro.name}
+      </td></tr>`;
+      for (const act of rubro.actividades) {
+        const s = monthToIdx(act.start), e = monthToIdx(act.end);
+        const statusColors = {pendiente:'#3c3c3b',proceso:'#C49955',revision:'#991547',completado:'#771139',bloqueado:'#555'};
+        html += `<tr class="gantt-row"><td class="gantt-td gantt-task-col">
+          <div class="gantt-task-name" style="padding-left:28px;">
+            <div style="width:7px;height:7px;border-radius:50%;background:${pillar.color};flex-shrink:0;"></div>
+            <span style="color:var(--silver-light);font-size:12px;">${act.name}</span>
+          </div>
+        </td>`;
+        for (let i = 0; i < MONTHS.length; i++) {
+          html += `<td class="gantt-td gantt-bar-cell" style="padding:0;position:relative;min-height:36px;">`;
+          if (i === s) {
+            const span = e - s + 1;
+            const barW = `calc(${span * 100}% - 6px)`;
+            const color = statusColors[act.status] || '#4A5568';
+            html += `<div class="gantt-bar" style="background:${color};width:${barW};left:3px;opacity:0.85;">${act.progress > 0 ? act.progress+'%' : ''}</div>`;
+          }
+          html += `</td>`;
+        }
+        html += '</tr>';
+      }
+    }
+  }
+  document.getElementById('ganttTable').innerHTML = html;
+}
+
+// Board
+function renderBoard() {
+  const cols = ['pendiente','proceso','revision','completado','bloqueado'];
+  cols.forEach(col => {
+    document.getElementById('cards-'+col).innerHTML = '';
+    document.getElementById('cnt-'+col).textContent = '';
+  });
+  const counts = {};
+  cols.forEach(c => counts[c] = 0);
+  for (const pillar of data.pillars) {
+    if (state.pillarFilter !== 'all' && state.pillarFilter !== pillar.id) continue;
+    for (const rubro of pillar.rubros) {
+      for (const act of rubro.actividades) {
+        const st = act.status || 'pendiente';
+        counts[st]++;
+        const container = document.getElementById('cards-'+st);
+        if (!container) continue;
+        const card = document.createElement('div');
+        card.className = 'board-card';
+        card.innerHTML = `
+          <div class="board-card-title">${act.name}</div>
+          <div style="font-size:11px;color:var(--silver);margin-bottom:8px;">${rubro.num} · ${pillar.icon} ${pillar.name}</div>
+          <div class="board-card-meta">
+            ${renderPriority(act.priority)}
+            <div style="font-size:11px;color:var(--silver);display:flex;align-items:center;gap:4px;">
+              <div class="avatar" style="width:18px;height:18px;font-size:9px;background:${getAvatarColor(act.resp)}20;color:${getAvatarColor(act.resp)};">${getInitials(act.resp)}</div>
+              ${act.resp.split(' ')[0]}
+            </div>
+          </div>
+          <div style="margin-top:8px;">${renderProgress(act.progress, act.id)}</div>
+        `;
+        card.onclick = () => openEditModal(act.id);
+        container.appendChild(card);
+      }
+    }
+  }
+  cols.forEach(c => { document.getElementById('cnt-'+c).textContent = counts[c] + ' items'; });
+}
+
+// ===== INTERACTIONS =====
+function togglePillar(id) {
+  state.openPillars[id] = !state.openPillars[id];
+  renderTableBody();
+}
+function toggleRubro(id) {
+  state.openRubros[id] = state.openRubros[id] === false ? true : false;
+  renderTableBody();
+}
+function toggleAct(id) {
+  state.openActs[id] = !state.openActs[id];
+  renderTableBody();
+}
+
+function findAct(id) {
+  for (const p of data.pillars)
+    for (const r of p.rubros)
+      for (const a of r.actividades)
+        if (a.id === id) return a;
+  return null;
+}
+
+function updateField(id, field, value) {
+  const act = findAct(id);
+  if (act) { act[field] = value; renderTableBody(); renderKPIs(); renderBoard(); }
+}
+function updateFieldDirect(id, field, value) {
+  const act = findAct(id);
+  if (act) { act[field] = value.trim(); renderKPIs(); }
+}
+function updateSubName(actId, subId, value) {
+  const act = findAct(actId);
+  if (act && act.subs) {
+    const sub = act.subs.find(s=>s.id===subId);
+    if (sub) sub.name = value.trim();
+  }
+}
+
+function filterPillar(id, el) {
+  state.pillarFilter = id;
+  document.querySelectorAll('.pillar-tab').forEach(t => t.classList.remove('all','active-j','active-t','active-f'));
+  if (id==='all') el.classList.add('all');
+  else if (id==='juridico') el.classList.add('active-j');
+  else if (id==='tecnico') el.classList.add('active-t');
+  else if (id==='financiero') el.classList.add('active-f');
+  renderTableBody(); renderGantt(); renderBoard();
+}
+
+function toggleFilter(st, el) {
+  document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  state.statusFilter = st;
+  renderTableBody();
+}
+
+function setView(v, btn) {
+  document.querySelectorAll('.view-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('listView').classList.toggle('hidden', v!=='list');
+  document.getElementById('ganttView').classList.toggle('active', v==='gantt');
+  document.getElementById('boardView').classList.toggle('active', v==='board');
+  if (v==='gantt') renderGantt();
+  if (v==='board') renderBoard();
+}
+
+function searchActs(q) {
+  q = q.toLowerCase();
+  document.querySelectorAll('.actividad-row').forEach(row => {
+    const text = row.textContent.toLowerCase();
+    row.style.display = (!q || text.includes(q)) ? '' : 'none';
+  });
+}
+
+// MODAL
+let modalMode = 'new'; let modalCtx = null;
+function openModal() { modalMode='new'; modalCtx=null; document.getElementById('modalTitle').textContent='Nueva Actividad'; resetModal(); document.getElementById('modalOverlay').classList.add('open'); }
+function openModalFor(pillarId, rubroId) { openModal(); document.getElementById('mPilar').value=pillarId; }
+function openEditModal(actId) {
+  const act = findAct(actId);
+  if (!act) return;
+  modalMode='edit'; modalCtx=actId;
+  document.getElementById('modalTitle').textContent='Editar Actividad';
+  document.getElementById('mName').value = act.name;
+  document.getElementById('mStatus').value = act.status;
+  document.getElementById('mResp').value = act.resp;
+  document.getElementById('mPriority').value = act.priority;
+  document.getElementById('mProgress').value = act.progress;
+  document.getElementById('mProgressVal').textContent = act.progress+'%';
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
+function resetModal() {
+  document.getElementById('mName').value='';
+  document.getElementById('mStatus').value='pendiente';
+  document.getElementById('mResp').value='';
+  document.getElementById('mPriority').value='media';
+  document.getElementById('mProgress').value=0;
+  document.getElementById('mProgressVal').textContent='0%';
+}
+function saveModal() {
+  const name = document.getElementById('mName').value.trim();
+  if (!name) return;
+  if (modalMode==='edit' && modalCtx) {
+    const act = findAct(modalCtx);
+    if (act) {
+      act.name = name;
+      act.status = document.getElementById('mStatus').value;
+      act.resp = document.getElementById('mResp').value || 'Sin asignar';
+      act.priority = document.getElementById('mPriority').value;
+      act.progress = parseInt(document.getElementById('mProgress').value);
+    }
+  } else {
+    const pillarId = document.getElementById('mPilar').value;
+    const pillar = data.pillars.find(p=>p.id===pillarId);
+    if (pillar && pillar.rubros.length > 0) {
+      const newAct = {
+        id: 'custom_'+Date.now(),
+        name: name,
+        resp: document.getElementById('mResp').value || 'Sin asignar',
+        start: document.getElementById('mStart').value || 'Por definir',
+        end: document.getElementById('mEnd').value || 'Por definir',
+        status: document.getElementById('mStatus').value,
+        priority: document.getElementById('mPriority').value,
+        progress: parseInt(document.getElementById('mProgress').value)
+      };
+      pillar.rubros[pillar.rubros.length-1].actividades.push(newAct);
+    }
+  }
+  closeModal();
+  renderTableBody(); renderKPIs(); renderGantt(); renderBoard();
+}
+document.getElementById('modalOverlay').addEventListener('click', function(e) { if (e.target===this) closeModal(); });
+
+// INIT
+renderKPIs();
+renderTableBody();
+renderGantt();
+</script>
+</body>
+</html>
